@@ -1,0 +1,40 @@
+---
+name: "Release apps for Nebula"
+
+# todo enable when completetelly ready
+on: {}
+#   push:
+#     tags:
+#       - "release/*"
+
+jobs:
+    release:
+        timeout-minutes: 30
+        runs-on: ubuntu-22.04
+        name: 'Build sources of affected apps'
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
+                ref: ${{ github.ref }}
+
+            - name: Setup node
+              uses: actions/setup-node@v4
+              with:
+                node-version-file: '.nvmrc'
+                cache: yarn
+
+            - name: Build project
+              run: env-cmd -f ./apps/explorer/.env.nebula1 yarn nx build explorer
+              if: ${{ contains('explorer', github.ref) }}
+
+            - name: Build project
+              run: env-cmd -f ./apps/governance/.env.nebula1 yarn nx build governance
+              if: ${{ contains('governance', github.ref) }}
+
+            - name: Build project
+              run: |
+                env-cmd -f ./apps/trading/.env.nebula1 yarn nx build trading
+                yarn nx export
+              if: ${{ contains('trading', github.ref) || contains('console', github.ref) }}
