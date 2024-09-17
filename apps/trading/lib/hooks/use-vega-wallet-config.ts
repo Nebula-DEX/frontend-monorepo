@@ -4,11 +4,7 @@ import {
   ViewPartyConnector,
   QuickStartConnector,
   createConfig,
-  fairground,
-  validatorsTestnet,
-  mainnet,
-  mirror,
-  stagnet,
+  nebula1,
   InBrowserConnector,
 } from '@vegaprotocol/wallet';
 import { CHAIN_IDS, useEnvironment } from '@vegaprotocol/environment';
@@ -52,8 +48,9 @@ export const useVegaWalletConfig = () => {
       viewParty,
       inBrowser,
     ].filter((c) => CONFIGURED_WALLETS.includes(c.id));
+
     const config = createConfig({
-      chains: [mainnet, mirror, fairground, validatorsTestnet, stagnet],
+      chains: [nebula1],
       defaultChainId: CHAIN_IDS[VEGA_ENV],
       connectors: filteredConnectors,
       walletConfig: {
@@ -66,6 +63,7 @@ export const useVegaWalletConfig = () => {
       },
       appName: APP_NAME,
     });
+
     return config;
   }, [
     CONFIGURED_WALLETS,

@@ -29,8 +29,8 @@ const STUDY_ORDER: Study[] = [
 ];
 
 export const DEFAULT_CHART_SETTINGS = {
-  chartlib: 'pennant' as const,
-  interval: Interval.INTERVAL_I15M,
+  chartlib: 'tradingview' as const,
+  interval: Interval.INTERVAL_I5M,
   type: ChartType.CANDLE,
   overlays: [Overlay.MOVING_AVERAGE],
   studies: [Study.MACD, Study.VOLUME],

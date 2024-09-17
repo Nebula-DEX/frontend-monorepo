@@ -378,14 +378,6 @@ const compileEnvVars = () => {
       'NX_TENDERMINT_WEBSOCKET_URL',
       process.env['NX_TENDERMINT_WEBSOCKET_URL']
     ),
-    CHROME_EXTENSION_URL: windowOrDefault(
-      'NX_CHROME_EXTENSION_URL',
-      process.env['NX_CHROME_EXTENSION_URL']
-    ),
-    MOZILLA_EXTENSION_URL: windowOrDefault(
-      'NX_MOZILLA_EXTENSION_URL',
-      process.env['NX_MOZILLA_EXTENSION_URL']
-    ),
     CHARTING_LIBRARY_PATH: windowOrDefault(
       'NX_CHARTING_LIBRARY_PATH',
       process.env['NX_CHARTING_LIBRARY_PATH']
@@ -581,8 +573,8 @@ const getEthereumProviderUrl = (
 ) => {
   if (envvar) return envvar;
   return network === Networks.MAINNET
-    ? 'https://mainnet.infura.io/v3/4f846e79e13f44d1b51bbd7ed9edefb8'
-    : 'https://sepolia.infura.io/v3/4f846e79e13f44d1b51bbd7ed9edefb8';
+    ? 'https://mainnet.infura.io/v3/6f6991e1760e40ccb05ebd5b6e0934ac'
+    : 'https://sepolia.infura.io/v3/6f6991e1760e40ccb05ebd5b6e0934ac';
 };
 /**
  * Provide a fallback etherscan url for test purposes in some apps

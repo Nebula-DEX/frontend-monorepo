@@ -1,18 +1,12 @@
 import type { ButtonHTMLAttributes, LiHTMLAttributes, ReactNode } from 'react';
 import { useState } from 'react';
-import {
-  DocsLinks,
-  DApp,
-  useLinks,
-  useFeatureFlags,
-} from '@vegaprotocol/environment';
+import { DApp, useLinks, useFeatureFlags } from '@vegaprotocol/environment';
 import { useGlobalStore } from '../../stores';
 import { VegaWalletConnectButton } from '../vega-wallet-connect-button';
 import {
   VegaIconNames,
   VegaIcon,
   LanguageSelector,
-  ThemeSwitcher,
   Intent,
 } from '@vegaprotocol/ui-toolkit';
 import * as N from '@radix-ui/react-navigation-menu';
@@ -23,7 +17,7 @@ import { Links } from '../../lib/links';
 import { cn } from '@vegaprotocol/ui-toolkit';
 import { VegaWalletMenu } from '../vega-wallet';
 import { useDialogStore, useWallet } from '@vegaprotocol/wallet-react';
-import { WalletIcon } from '../icons/wallet';
+import { WalletIcon } from './wallet-icon';
 import { ProtocolUpgradeCountdown } from '@vegaprotocol/proposals';
 import { useT, useI18n } from '../../lib/use-t';
 import { supportedLngs } from '../../lib/i18n';
@@ -70,7 +64,6 @@ export const Navbar = () => {
       <div className="grow basis-0 flex items-center justify-end gap-2">
         <ProtocolUpgradeCountdown />
         <div className="flex items-center">
-          <ThemeSwitcher />
           <SettingsPopover />
           {supportedLngs.length > 1 ? (
             <LanguageSelector
@@ -201,13 +194,6 @@ const NavbarMenu = ({ onClick }: { onClick: () => void }) => {
                 <NavbarSubItem>
                   <NavbarLinkExternal to={EXPLORER_LINK}>
                     {t('Explorer')}
-                  </NavbarLinkExternal>
-                </NavbarSubItem>
-              )}
-              {DocsLinks?.NEW_TO_VEGA && (
-                <NavbarSubItem>
-                  <NavbarLinkExternal to={DocsLinks?.NEW_TO_VEGA}>
-                    {t('Docs')}
                   </NavbarLinkExternal>
                 </NavbarSubItem>
               )}
