@@ -11,6 +11,18 @@ name: Release production apps for Nebula
 
 jobs:
   build_dist:
+    strategy:
+      matrix:
+        build: &matrix_build
+          - id: neb_xchange
+            env: neb_exchange
+            path: /var/www/neb.exchange
+          - id: neb_ninja
+            env: neb_exchange,neb_ninja
+            path: /var/www/neb.ninja
+          - id: n_mainnet_community
+            env: neb_exchange,n_mainnet_community
+            path: /var/www/n.mainnet_community
     name: 'Build dist'
     runs-on: ubuntu-latest
     steps:
@@ -40,25 +52,25 @@ jobs:
         shell: bash
         if: ${{ contains(github.ref_name, 'explorer') || contains(github.ref_name, 'all') }}
         run: |
-          yarn env-cmd -f ./apps/explorer/.env.nebula1 yarn nx build explorer
+          yarn env-cmd --verbose --rc-file ./apps/explorer/.env.cmdrc -e "${{ matrix.build.env}}" yarn nx build explorer --skip-nx-cache
 
       - name: Build console
         shell: bash
         if: ${{ contains(github.ref_name, 'trading') || contains(github.ref_name, 'console') || contains(github.ref_name, 'all') }}
         run: |
-          yarn env-cmd -f ./apps/trading/.env.nebula1 yarn nx build trading
+          yarn env-cmd --verbose --rc-file ./apps/trading/.env.cmdrc -e "${{ matrix.build.env}}" yarn nx build trading --skip-nx-cache
           yarn nx export
 
       - name: Build governance
         shell: bash
         if: ${{ contains(github.ref_name, 'explorer') || contains(github.ref_name, 'all') }}
         run: |
-          yarn env-cmd -f ./apps/governance/.env.nebula1 yarn nx build governance
+          yarn env-cmd --verbose --rc-file ./apps/governance/.env.cmdrc -e "${{ matrix.build.env}}" yarn nx build governance --skip-nx-cache
 
       - name: Upload built artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: frontend_dist
+          name: frontend_dist_${{ matrix.build.id }}
           path: ./dist
 
   publish_dist:
@@ -70,11 +82,12 @@ jobs:
     strategy:
       matrix:
         target: ${{ fromJSON( vars.JSON_FRONTEND_SERVERS) }}
+        build: *matrix_build
     steps:
       - name: Download built dist
         uses: actions/download-artifact@v4
         with:
-          name: frontend_dist
+          name: frontend_dist_${{ matrix.build.id }}
           path: ./
 
       - id: release_version
@@ -93,11 +106,11 @@ jobs:
           SOURCE: 'apps/explorer/'
           REMOTE_HOST: '${{ matrix.target }}'
           REMOTE_USER: 'fe-deployment'
-          TARGET: '/var/www/explorer-dist/${{ steps.release_version.outputs.number }}'
+          TARGET: '${{ matrix.build.path }}/explorer/dist/${{ steps.release_version.outputs.number }}'
           # EXCLUDE: "/dist/, /node_modules/"
           SCRIPT_BEFORE: |
             whoami
-            sudo mkdir -p /var/www/explorer-dist
+            sudo mkdir -p ${{ matrix.build.path }}/explorer/dist
           SCRIPT_AFTER: |
             whoami
             ls -al
@@ -112,11 +125,11 @@ jobs:
           SOURCE: 'apps/trading/exported/'
           REMOTE_HOST: '${{ matrix.target }}'
           REMOTE_USER: 'fe-deployment'
-          TARGET: '/var/www/trading-dist/${{ steps.release_version.outputs.number }}'
+          TARGET: '${{ matrix.build.path }}/trading/dist/${{ steps.release_version.outputs.number }}'
           # EXCLUDE: "/dist/, /node_modules/"
           SCRIPT_BEFORE: |
             whoami
-            sudo mkdir -p /var/www/trading-dist
+            sudo mkdir -p ${{ matrix.build.path }}/trading/dist
           SCRIPT_AFTER: |
             whoami
             ls -al
@@ -131,11 +144,11 @@ jobs:
           SOURCE: 'apps/governance/'
           REMOTE_HOST: '${{ matrix.target }}'
           REMOTE_USER: 'fe-deployment'
-          TARGET: '/var/www/governance-dist/${{ steps.release_version.outputs.number }}'
+          TARGET: '${{ matrix.build.path }}/governance/dist/${{ steps.release_version.outputs.number }}'
           # EXCLUDE: "/dist/, /node_modules/"
           SCRIPT_BEFORE: |
             whoami
-            sudo mkdir -p /var/www/governance-dist
+            sudo mkdir -p ${{ matrix.build.path }}/governance/dist
           SCRIPT_AFTER: |
             whoami
             ls -al
@@ -148,6 +161,7 @@ jobs:
     strategy:
       matrix:
         target: ${{ fromJSON( vars.JSON_FRONTEND_SERVERS) }}
+        build: *matrix_build
     steps:
       - name: Enable published explorer
         if: ${{ contains(github.ref_name, 'explorer') || contains(github.ref_name, 'all') }}
@@ -157,8 +171,8 @@ jobs:
           username: fe-deployment
           key: ${{ secrets.FRONTEND_DEPLOYMENT_SSH_KEY }}
           script: |
-            sudo rm -rf /var/www/explorer || echo;
-            sudo ln -s /var/www/explorer-dist/${{ needs.publish_dist.outputs.RELEASE_VERSION }} /var/www/explorer;
+            sudo rm -rf ${{ matrix.build.path }}/explorer/live || echo;
+            sudo ln -s ${{ matrix.build.path }}/explorer/dist/${{ needs.publish_dist.outputs.RELEASE_VERSION }} ${{ matrix.build.path }}/explorer/live;
 
       - name: Enable published console
         if: ${{ contains(github.ref_name, 'trading') || contains(github.ref_name, 'console') || contains(github.ref_name, 'all') }}
@@ -168,8 +182,8 @@ jobs:
           username: fe-deployment
           key: ${{ secrets.FRONTEND_DEPLOYMENT_SSH_KEY }}
           script: |
-            sudo rm -rf /var/www/trading || echo;
-            sudo ln -s /var/www/trading-dist/${{ needs.publish_dist.outputs.RELEASE_VERSION }} /var/www/trading;
+            sudo rm -rf ${{ matrix.build.path }}/trading/live || echo;
+            sudo ln -s ${{ matrix.build.path }}/trading/dist/${{ needs.publish_dist.outputs.RELEASE_VERSION }} ${{ matrix.build.path }}/trading/live;
 
       - name: Enable published governance
         if: ${{ contains(github.ref_name, 'governance') || contains(github.ref_name, 'all') }}
@@ -179,5 +193,5 @@ jobs:
           username: fe-deployment
           key: ${{ secrets.FRONTEND_DEPLOYMENT_SSH_KEY }}
           script: |
-            sudo rm -rf /var/www/governance || echo;
-            sudo ln -s /var/www/governance-dist/${{ needs.publish_dist.outputs.RELEASE_VERSION }} /var/www/governance;
+            sudo rm -rf ${{ matrix.build.path }}/governance/live || echo;
+            sudo ln -s ${{ matrix.build.path }}/governance/dist/${{ needs.publish_dist.outputs.RELEASE_VERSION }} ${{ matrix.build.path }}/governance/live;
