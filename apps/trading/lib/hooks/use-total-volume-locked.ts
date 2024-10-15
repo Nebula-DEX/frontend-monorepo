@@ -11,13 +11,14 @@ export const useTotalValueLocked = () => {
   const { VEGA_ENV } = useEnvironment();
   const { data } = useAssets();
 
-  const assets = Array.from(data?.values() || [])
-    .filter((a) => a.status === 'STATUS_ENABLED')
-    .filter((a) => a.symbol !== 'VEGA');
+  const assets = Array.from(data?.values() || []).filter(
+    (a) => a.status === 'STATUS_ENABLED'
+  );
 
   const addresses = ASSET_POOL_ADDRESSES[VEGA_ENV];
 
-  const tradableAssets = assets.filter((asset) => asset.id !== APP_TOKEN_ID);
+  // All markets are currently settled in the app token (NEB)
+  const tradableAssets = assets.filter((asset) => asset.id === APP_TOKEN_ID);
   const contracts = tradableAssets.map((asset) => {
     const chainId = Number(asset.chainId);
     const assetPoolAddress = addresses[chainId];

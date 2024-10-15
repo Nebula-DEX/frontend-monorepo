@@ -1,4 +1,5 @@
 export const APP_NAME = 'Nebula';
+export const APP_SYMBOL = 'NEB';
 
 // Neb token Id
 export const APP_TOKEN_ID =

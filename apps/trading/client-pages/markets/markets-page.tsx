@@ -52,6 +52,7 @@ import { useMarketClickHandler } from '../../lib/hooks/use-market-click-handler'
 import MarketListTable from './market-list-table';
 import type { CellClickedEvent, IRowNode } from 'ag-grid-community';
 import { FilterSummary } from '../../components/market-selector/filter-summary';
+import { APP_SYMBOL } from '../../lib/constants';
 
 const POLLING_TIME = 2000;
 
@@ -127,7 +128,7 @@ export const MarketsPage = () => {
               <div className="flex items-center gap-2 justify-between flex-wrap grow">
                 {totalVolume24h && (
                   <span className="text-xl">
-                    ${formatNumber(totalVolume24h, 2)}
+                    {formatNumber(totalVolume24h, 2)} {APP_SYMBOL}
                   </span>
                 )}
                 <div>{totalVolumeSparkline}</div>
@@ -137,7 +138,11 @@ export const MarketsPage = () => {
           <Card key="tvl" className="flex grow" loading={!tvl && tvlLoading}>
             <div className="flex gap-2 flex-col h-full">
               <h2>{t('TVL')}</h2>
-              {tvl && <span className="text-xl">${formatNumber(tvl, 2)}</span>}
+              {tvl && (
+                <span className="text-xl">
+                  {formatNumber(tvl, 2)} {APP_SYMBOL}
+                </span>
+              )}
             </div>
           </Card>
         </div>
