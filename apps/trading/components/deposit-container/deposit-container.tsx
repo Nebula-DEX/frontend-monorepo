@@ -6,14 +6,15 @@ import { useSquid } from './use-squid';
 import { FallbackDepositForm } from './fallback-deposit-form';
 import { useT } from '../../lib/use-t';
 import { Networks, useEnvironment } from '@vegaprotocol/environment';
+import { type TxDeposit, type TxSquidDeposit } from '../../stores/evm';
 
 /**
  * Gets env vars, assets, and configs required for the deposit form
  */
-export const DepositContainer = ({
-  initialAssetId,
-}: {
+export const DepositContainer = (props: {
   initialAssetId?: string;
+  onDeposit?: (tx: TxDeposit | TxSquidDeposit) => void;
+  minAmount?: string;
 }) => {
   const t = useT();
   const { VEGA_ENV } = useEnvironment();
@@ -28,7 +29,7 @@ export const DepositContainer = ({
   const allConfigs = [config, ...configs];
 
   // Make sure asset is an existing enabled asset
-  const asset = assets?.find((a) => a.id === initialAssetId);
+  const asset = assets?.find((a) => a.id === props.initialAssetId);
 
   if ((loading || !squid) && !squidError) {
     return (
@@ -49,6 +50,8 @@ export const DepositContainer = ({
         assets={assets as AssetERC20[]}
         initialAsset={asset as AssetERC20}
         configs={allConfigs}
+        onDeposit={props.onDeposit}
+        minAmount={props.minAmount}
       />
     );
   }
@@ -61,6 +64,8 @@ export const DepositContainer = ({
       assets={assets as AssetERC20[]}
       initialAsset={asset as AssetERC20}
       configs={allConfigs}
+      onDeposit={props.onDeposit}
+      minAmount={props.minAmount}
     />
   );
 };

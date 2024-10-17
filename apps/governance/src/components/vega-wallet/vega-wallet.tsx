@@ -23,7 +23,6 @@ import {
   WalletCardHeader,
   WalletCardRow,
 } from '../wallet-card';
-import { VegaWalletPrompt } from './vega-wallet-prompt';
 import { usePollForDelegations } from './hooks';
 import { useVegaWallet, useDialogStore } from '@vegaprotocol/wallet-react';
 import { Button, ButtonLink } from '@vegaprotocol/ui-toolkit';
@@ -78,18 +77,15 @@ const VegaWalletNotConnected = () => {
   const { t } = useTranslation();
   const openVegaWalletDialog = useDialogStore((store) => store.open);
   return (
-    <>
-      <Button
-        onClick={() => {
-          openVegaWalletDialog();
-        }}
-        fill={true}
-        data-testid="connect-vega-wallet"
-      >
-        {t('connectVegaWalletToUseAssociated')}
-      </Button>
-      <VegaWalletPrompt />
-    </>
+    <Button
+      onClick={() => {
+        openVegaWalletDialog();
+      }}
+      fill={true}
+      data-testid="connect-vega-wallet"
+    >
+      {t('connectVegaWalletToUseAssociated')}
+    </Button>
   );
 };
 
@@ -178,7 +174,18 @@ const VegaWalletConnected = ({ vegaKeys }: VegaWalletConnectedProps) => {
   }, [currentStakeAvailable, decimals, delegations]);
 
   const footer = (
-    <div className="flex justify-end">
+    <div className="flex justify-between">
+      <ButtonLink
+        data-testid="manage-vega-wallet"
+        onClick={() =>
+          appDispatch({
+            type: AppStateActionType.SET_EMBEDDED_WALLET_MANAGE_OVERLAY,
+            isOpen: true,
+          })
+        }
+      >
+        Open wallet
+      </ButtonLink>
       <ButtonLink
         data-testid="manage-vega-wallet"
         onClick={() =>
