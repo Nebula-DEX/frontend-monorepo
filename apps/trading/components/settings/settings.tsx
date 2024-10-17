@@ -2,7 +2,6 @@ import {
   Dialog,
   Intent,
   Popover,
-  Switch,
   ToastPositionSetter,
   Button,
   VegaIcon,

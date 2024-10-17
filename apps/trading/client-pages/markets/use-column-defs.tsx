@@ -28,7 +28,6 @@ import {
 } from '@vegaprotocol/markets';
 import { useT } from '../../lib/use-t';
 import { Emblem } from '@vegaprotocol/emblem';
-import { useChainId } from '@vegaprotocol/wallet-react';
 import { MarketIcon, getMarketStateTooltip } from './market-icon';
 
 const openInterestValues = (data: MarketMaybeWithData) => {
@@ -149,7 +148,6 @@ export const priceValueFormatter = (
 
 export const useMarketsColumnDefs = () => {
   const t = useT();
-  const { chainId } = useChainId();
 
   return useMemo<ColDef[]>(
     () => [
@@ -332,7 +330,7 @@ export const useMarketsColumnDefs = () => {
         },
       },
     ],
-    [chainId, t]
+    [t]
   );
 };
 
