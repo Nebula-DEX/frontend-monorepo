@@ -56,8 +56,6 @@ const fullMock = {
   },
 };
 
-jest.mock('../emblem-with-chain/emblem-with-chain');
-
 describe('Price in Market component', () => {
   it('Renders the raw price before there is no market data', () => {
     const res = render(renderComponent('100', '123', [fullMock]));

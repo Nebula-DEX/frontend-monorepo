@@ -14,7 +14,7 @@ describe('ProposalFormMinRequirements', () => {
     expect(baseElement).toBeTruthy();
 
     expect(baseElement).toHaveTextContent(
-      'You must have at least 2 VEGA associated to make a proposal'
+      'You must have at least 2 NEB associated to make a proposal'
     );
   });
 
@@ -29,7 +29,7 @@ describe('ProposalFormMinRequirements', () => {
     expect(baseElement).toBeTruthy();
 
     expect(baseElement).toHaveTextContent(
-      'You must have at least 3 VEGA associated to make a proposal'
+      'You must have at least 3 NEB associated to make a proposal'
     );
   });
 });

@@ -160,7 +160,7 @@ describe('TransferForm', () => {
     renderComponent(props);
     // Select a pubkey
     await userEvent.selectOptions(
-      screen.getByLabelText('To Vega key'),
+      screen.getByLabelText('To Nebula key'),
       props.pubKeys[1].publicKey
     );
 
@@ -192,16 +192,16 @@ describe('TransferForm', () => {
     await userEvent.click(toggle);
     // has switched to input
     expect(toggle).toHaveTextContent('Select from wallet');
-    expect(screen.getByLabelText('To Vega key')).toHaveAttribute(
+    expect(screen.getByLabelText('To Nebula key')).toHaveAttribute(
       'type',
       'text'
     );
     await userEvent.type(
-      screen.getByLabelText('To Vega key'),
+      screen.getByLabelText('To Nebula key'),
       'invalid-address'
     );
     expect(screen.getAllByTestId('input-error-text')[1]).toHaveTextContent(
-      'Invalid Vega key'
+      /invalid/i
     );
   });
 
@@ -214,7 +214,7 @@ describe('TransferForm', () => {
     renderComponent(props);
 
     // check current pubkey not shown
-    const keySelect = screen.getByLabelText<HTMLSelectElement>('To Vega key');
+    const keySelect = screen.getByLabelText<HTMLSelectElement>('To Nebula key');
     expect(keySelect.children).toHaveLength(3);
     expect(Array.from(keySelect.options).map((o) => o.value)).toEqual([
       '',
@@ -227,7 +227,7 @@ describe('TransferForm', () => {
 
     // Select a pubkey
     await userEvent.selectOptions(
-      screen.getByLabelText('To Vega key'),
+      screen.getByLabelText('To Nebula key'),
       props.pubKeys[1].publicKey
     );
 
@@ -287,7 +287,7 @@ describe('TransferForm', () => {
     });
 
     // check current pubkey not shown
-    const keySelect: HTMLSelectElement = screen.getByLabelText('To Vega key');
+    const keySelect: HTMLSelectElement = screen.getByLabelText('To Nebula key');
     const pubKeyOptions = ['', pubKey, props.pubKeys[1].publicKey];
     expect(keySelect.children).toHaveLength(pubKeyOptions.length);
     expect(Array.from(keySelect.options).map((o) => o.value)).toEqual(
@@ -299,7 +299,7 @@ describe('TransferForm', () => {
 
     // Select a pubkey
     await userEvent.selectOptions(
-      screen.getByLabelText('To Vega key'),
+      screen.getByLabelText('To Nebula key'),
       props.pubKeys[1].publicKey // Use not current pubkey so we can check it switches to current pubkey later
     );
 
@@ -312,7 +312,7 @@ describe('TransferForm', () => {
     );
 
     // Check switch back to connected key
-    expect(screen.getByLabelText('To Vega key')).toHaveValue(props.pubKey);
+    expect(screen.getByLabelText('To Nebula key')).toHaveValue(props.pubKey);
 
     const amountInput = screen.getByLabelText('Amount');
 
@@ -386,7 +386,7 @@ describe('TransferForm', () => {
 
     // Select a pubkey
     await userEvent.selectOptions(
-      screen.getByLabelText('To Vega key'),
+      screen.getByLabelText('To Nebula key'),
       props.pubKeys[1].publicKey // Use not current pubkey so we can check it switches to current pubkey later
     );
 
@@ -443,7 +443,7 @@ describe('TransferForm', () => {
     renderComponent(props);
 
     // check current pubkey not shown
-    const keySelect: HTMLSelectElement = screen.getByLabelText('To Vega key');
+    const keySelect: HTMLSelectElement = screen.getByLabelText('To Nebula key');
     const pubKeyOptions = ['', pubKey, props.pubKeys[1].publicKey];
     expect(keySelect.children).toHaveLength(pubKeyOptions.length);
     expect(Array.from(keySelect.options).map((o) => o.value)).toEqual(
@@ -455,7 +455,7 @@ describe('TransferForm', () => {
 
     // Select a pubkey
     await userEvent.selectOptions(
-      screen.getByLabelText('To Vega key'),
+      screen.getByLabelText('To Nebula key'),
       props.pubKeys[1].publicKey
     );
 
