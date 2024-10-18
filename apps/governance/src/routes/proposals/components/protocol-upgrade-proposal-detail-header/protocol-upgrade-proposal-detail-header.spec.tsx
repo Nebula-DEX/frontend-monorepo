@@ -13,6 +13,6 @@ describe('ProtocolUpgradeProposalDetailHeader', () => {
     const { getByText } = render(
       <ProtocolUpgradeProposalDetailHeader releaseTag="v1.0.0" />
     );
-    expect(getByText('Vega Release v1.0.0')).toBeTruthy();
+    expect(getByText('Nebula Release v1.0.0')).toBeTruthy();
   });
 });

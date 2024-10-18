@@ -73,9 +73,7 @@ describe('Vote buttons', () => {
   it('should tell the user they need tokens if their current stake is 0', () => {
     renderComponent({ currentStakeAvailable: new BigNumber(0) });
     expect(
-      screen.getByText(
-        'You need some VEGA tokens to participate in governance.'
-      )
+      screen.getByText('You need some NEB tokens to participate in governance.')
     ).toBeTruthy();
   });
 
@@ -86,7 +84,7 @@ describe('Vote buttons', () => {
     });
     expect(
       screen.getByText(
-        'You must have at least 2 VEGA associated to vote on this proposal'
+        'You must have at least 2 NEB associated to vote on this proposal'
       )
     ).toBeTruthy();
   });
