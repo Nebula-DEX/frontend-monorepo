@@ -73,9 +73,9 @@ export const CrudeOil = (props: SVGAttributes<SVGElement>) => {
         d="M35.22 29.81c3.99 2.06 8.92 3.47 13.08 4.18"
         fill="none"
         stroke="#ffffff"
-        stroke-width="3"
-        stroke-linecap="round"
-        stroke-miterlimit="10"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeMiterlimit="10"
       ></path>
     </EmblemSvg>
   );

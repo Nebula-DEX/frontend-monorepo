@@ -5,16 +5,16 @@ export const Aud = (props: SVGAttributes<SVGElement>) => {
   return (
     <EmblemSvg
       {...props}
-      shape-rendering="geometricPrecision"
-      text-rendering="geometricPrecision"
-      image-rendering="optimizeQuality"
-      fill-rule="evenodd"
-      clip-rule="evenodd"
+      shapeRendering="geometricPrecision"
+      textRendering="geometricPrecision"
+      imageRendering="optimizeQuality"
+      fillRule="evenodd"
+      clipRule="evenodd"
       viewBox="0 0 512 511.995"
     >
       <path
         fill="#ECCA43"
-        fill-rule="nonzero"
+        fillRule="nonzero"
         d="M256 0c70.685 0 134.689 28.659 181.015 74.984C483.341 121.306 512 185.311 512 256c0 70.684-28.659 134.689-74.985 181.015-46.326 46.322-110.33 74.98-181.015 74.98-70.685 0-134.689-28.658-181.015-74.98C28.659 390.689 0 326.684 0 256c0-70.689 28.659-134.694 74.985-181.016C121.307 28.659 185.311 0 256 0z"
       />
       <ellipse fill="#F7E259" cx="256" cy="255.998" rx="250.992" ry="250.991" />
@@ -24,7 +24,7 @@ export const Aud = (props: SVGAttributes<SVGElement>) => {
       />
       <path
         fill="#D7925B"
-        fill-rule="nonzero"
+        fillRule="nonzero"
         d="M256 58.922c54.414 0 103.688 22.061 139.353 57.725 35.664 35.661 57.725 84.935 57.725 139.349 0 54.414-22.061 103.688-57.725 139.352-35.665 35.664-84.939 57.726-139.353 57.726-54.414 0-103.688-22.062-139.349-57.726-35.664-35.664-57.725-84.938-57.725-139.352s22.061-103.688 57.725-139.349C152.312 80.983 201.586 58.922 256 58.922z"
       />
       <circle fill="#EDA140" cx="256.001" cy="255.997" r="192.069" />
