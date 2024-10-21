@@ -22,7 +22,6 @@ import {
   FormSecondaryActionButton,
   FormSecondaryActionWrapper,
 } from '../form-secondary-action';
-import { AssetOption } from '../asset-option';
 
 export const OnboardFallbackDepositForm = (props: {
   assets: Array<AssetERC20>;
@@ -41,12 +40,10 @@ export const OnboardFallbackDepositForm = (props: {
       <form data-testid="deposit-form" onSubmit={onSubmit}>
         <Fields.ToPubKey control={form.control} pubKeys={pubKeys} />
         {toAsset && (
-          <FormGroup label={t('Asset')} labelFor="asset">
-            <AssetOption
-              asset={toAsset}
-              balance={balances.data?.balanceOf.toString()}
-            />
-          </FormGroup>
+          <Fields.ToAssetTargeted
+            toAsset={toAsset}
+            balance={balances.data?.balanceOf.toString() || '0'}
+          />
         )}
         <Fields.FromAddress control={form.control} />
         <Controller

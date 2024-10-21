@@ -243,6 +243,7 @@
     /* Border radius */
     --panel-border-radius: theme(borderRadius.lg);
     --grid-border-radius: theme(borderRadius.lg);
+    --input-border-radius: theme(borderRadius.lg);
   }
 
   .dark {
