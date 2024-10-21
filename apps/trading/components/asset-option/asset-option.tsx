@@ -26,13 +26,7 @@ export const AssetOption = ({
             : asset.source.__typename}
         </div>
       </div>
-      {balance && (
-        <div className="ml-auto text-sm">
-          {typeof balance === 'string'
-            ? addDecimalsFormatNumber(balance, asset.decimals)
-            : balance}
-        </div>
-      )}
+      {balance && <div className="ml-auto text-sm">{balance}</div>}
     </div>
   );
 };
