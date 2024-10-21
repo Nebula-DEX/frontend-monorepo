@@ -42,6 +42,14 @@ export const DepositForm = (props: {
   return (
     <FormProvider {...form}>
       <form data-testid="deposit-form" onSubmit={onSubmit}>
+        <Fields.ToPubKeySelect control={form.control} pubKeys={pubKeys} />
+        <Fields.ToAsset
+          control={form.control}
+          assets={props.assets}
+          toAsset={toAsset}
+          queryKey={balances.queryKey}
+          route={route.data?.route}
+        />
         <Fields.FromAddress control={form.control} />
         <Fields.FromChain
           control={form.control}
@@ -57,14 +65,6 @@ export const DepositForm = (props: {
           control={form.control}
           balanceOf={balances.data?.balanceOf}
           nativeBalanceOf={nativeBalance.data}
-        />
-        <Fields.ToPubKeySelect control={form.control} pubKeys={pubKeys} />
-        <Fields.ToAsset
-          control={form.control}
-          assets={props.assets}
-          toAsset={toAsset}
-          queryKey={balances.queryKey}
-          route={route.data?.route}
         />
         {isSwap && (
           <div className="mb-4">

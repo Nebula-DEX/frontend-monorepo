@@ -35,6 +35,13 @@ export const FallbackDepositForm = (props: {
   return (
     <FormProvider {...form}>
       <form data-testid="deposit-form" onSubmit={onSubmit}>
+        <Fields.ToPubKeySelect control={form.control} pubKeys={pubKeys} />
+        <Fields.ToAsset
+          control={form.control}
+          assets={props.assets}
+          toAsset={toAsset}
+          queryKey={balances.queryKey}
+        />
         <Fields.FromAddress control={form.control} />
         <Fields.FromChain control={form.control} disabled={true} />
         <Fields.FromAsset
@@ -63,13 +70,6 @@ export const FallbackDepositForm = (props: {
               </Tooltip>
             ) : undefined
           }
-        />
-        <Fields.ToPubKeySelect control={form.control} pubKeys={pubKeys} />
-        <Fields.ToAsset
-          control={form.control}
-          assets={props.assets}
-          toAsset={toAsset}
-          queryKey={balances.queryKey}
         />
         <Fields.Amount
           control={form.control}
