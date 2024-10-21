@@ -6,12 +6,12 @@ import { useSquid } from './use-squid';
 import { useT } from '../../lib/use-t';
 import { type TxDeposit, type TxSquidDeposit } from '../../stores/evm';
 import { OnboardFallbackDepositForm } from './onboard-fallback-deposit-form';
+import { ONBOARDING_TARGET_ASSET } from '../../lib/constants';
 
 /**
  * Gets env vars, assets, and configs required for the deposit form
  */
 export const OnboardDeposit = (props: {
-  initialAssetId?: string;
   onDeposit?: (tx: TxDeposit | TxSquidDeposit) => void;
   minAmount?: string;
 }) => {
@@ -27,7 +27,7 @@ export const OnboardDeposit = (props: {
   const allConfigs = [config, ...configs];
 
   // Make sure asset is an existing enabled asset
-  const asset = assets?.find((a) => a.id === props.initialAssetId);
+  const asset = assets?.find((a) => a.id === ONBOARDING_TARGET_ASSET);
 
   if (assetsLoading || squidPending) {
     return (

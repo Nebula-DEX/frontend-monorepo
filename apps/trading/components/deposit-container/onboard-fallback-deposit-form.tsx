@@ -35,22 +35,20 @@ export const OnboardFallbackDepositForm = (props: {
   const { pubKeys } = useVegaWallet();
   const { form, toAsset, balances, deposit, onSubmit } =
     useFallbackDepositForm(props);
-  const amount = form.watch('amount');
 
   return (
     <FormProvider {...form}>
       <form data-testid="deposit-form" onSubmit={onSubmit}>
-        <Fields.FromAddress control={form.control} />
+        <Fields.ToPubKey control={form.control} pubKeys={pubKeys} />
         {toAsset && (
           <FormGroup label={t('Asset')} labelFor="asset">
-            <div className="flex gap-1 border bg-surface-2 px-2 rounded-lg">
-              <AssetOption
-                asset={toAsset}
-                balance={balances.data?.balanceOf.toString()}
-              />
-            </div>
+            <AssetOption
+              asset={toAsset}
+              balance={balances.data?.balanceOf.toString()}
+            />
           </FormGroup>
         )}
+        <Fields.FromAddress control={form.control} />
         <Controller
           control={form.control}
           name="amount"
@@ -84,14 +82,6 @@ export const OnboardFallbackDepositForm = (props: {
             );
           }}
         />
-        <Fields.ToPubKey control={form.control} pubKeys={pubKeys} />
-        {toAsset && (
-          <Fields.Receives
-            label={t('Amount')}
-            amount={amount || '0'}
-            toAsset={toAsset}
-          />
-        )}
         <Button
           type="submit"
           size="lg"

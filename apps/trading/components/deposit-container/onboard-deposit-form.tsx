@@ -43,6 +43,7 @@ export const OnboardDepositForm = (props: {
   return (
     <FormProvider {...form}>
       <form data-testid="deposit-form" onSubmit={onSubmit}>
+        <Fields.ToPubKey control={form.control} pubKeys={pubKeys} />
         <Fields.FromAddress control={form.control} />
         {props.squid && props.squid.initialized ? (
           <>
@@ -66,7 +67,6 @@ export const OnboardDepositForm = (props: {
           balanceOf={balances.data?.balanceOf}
           nativeBalanceOf={nativeBalance.data}
         />
-        <Fields.ToPubKey control={form.control} pubKeys={pubKeys} />
         {toAsset && (
           <div className="mb-4">
             <Fields.Receives

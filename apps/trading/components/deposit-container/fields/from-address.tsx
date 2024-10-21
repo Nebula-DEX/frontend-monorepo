@@ -43,8 +43,8 @@ export function FromAddress(props: { control: Control<FormFields> }) {
           return (
             <>
               {isConnected ? (
-                <div className="flex items-center gap-1">
-                  <Emblem chain={String(chainId)} />
+                <div className="flex items-center gap-2">
+                  <Emblem chain={String(chainId)} size={25} />
                   <input
                     value={address}
                     readOnly

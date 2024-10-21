@@ -4,7 +4,6 @@ import { StepHeader } from './step-header';
 import { Link } from 'react-router-dom';
 import { Card } from '../../components/card';
 import { OnboardDeposit } from '../../components/deposit-container';
-import { ONBOARDING_TARGET_ASSET } from '../../lib/constants';
 import { Links } from '../../lib/links';
 import { useOnboardStore } from '../../stores/onboard';
 import { ProgressionChain } from './step-progression-chain';
@@ -29,7 +28,6 @@ export const StepDeposit = (props: { onComplete: () => void }) => {
         <OnboardDeposit
           onDeposit={props.onComplete}
           minAmount={requiredFunds?.toString()}
-          initialAssetId={ONBOARDING_TARGET_ASSET}
         />
       </Card>
       <p className="flex gap-4 justify-center text-center">

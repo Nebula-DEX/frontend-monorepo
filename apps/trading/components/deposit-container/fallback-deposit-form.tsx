@@ -1,12 +1,7 @@
 import { FormProvider } from 'react-hook-form';
 
 import { type AssetERC20 } from '@vegaprotocol/assets';
-import {
-  Button,
-  Intent,
-  TradingRichSelectTriggerContent,
-  Tooltip,
-} from '@vegaprotocol/ui-toolkit';
+import { Button, Intent } from '@vegaprotocol/ui-toolkit';
 import { useVegaWallet } from '@vegaprotocol/wallet-react';
 
 import { useT } from '../../lib/use-t';
@@ -14,8 +9,6 @@ import { useT } from '../../lib/use-t';
 import * as Fields from './fields';
 
 import { type Configs } from './form-schema';
-import { AssetOption } from '../asset-option';
-import { formatNumber } from '@vegaprotocol/utils';
 import { FeedbackDialog } from './feedback-dialog';
 import { useFallbackDepositForm } from './use-fallback-deposit-form';
 import { type TxDeposit } from '../../stores/evm';
@@ -43,34 +36,6 @@ export const FallbackDepositForm = (props: {
           queryKey={balances.queryKey}
         />
         <Fields.FromAddress control={form.control} />
-        <Fields.FromChain control={form.control} disabled={true} />
-        <Fields.FromAsset
-          control={form.control}
-          disabled={true}
-          disabledMessage={
-            toAsset ? (
-              <Tooltip
-                description={t('Swaps not available')}
-                align="center"
-                side="bottom"
-                sideOffset={1}
-              >
-                <span>
-                  <TradingRichSelectTriggerContent>
-                    <AssetOption
-                      asset={toAsset}
-                      balance={
-                        <span>
-                          {formatNumber(balances.data?.balanceOf || 0)}
-                        </span>
-                      }
-                    />
-                  </TradingRichSelectTriggerContent>
-                </span>
-              </Tooltip>
-            ) : undefined
-          }
-        />
         <Fields.Amount
           control={form.control}
           balanceOf={balances.data?.balanceOf}
