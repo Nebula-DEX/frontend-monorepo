@@ -13,7 +13,6 @@ import {
 } from '../../form-secondary-action';
 import { Faucet } from '../faucet';
 import { type FormFields } from '../form-schema';
-import { isAssetUSDTArb } from '../../../lib/utils/is-asset-usdt-arb';
 import { useT } from '../../../lib/use-t';
 import {
   type AssetERC20,
@@ -76,13 +75,6 @@ export function ToAsset(props: {
             </TradingRichSelect>
             {fieldState.error && (
               <TradingInputError>{fieldState.error.message}</TradingInputError>
-            )}
-            {props.toAsset && !isAssetUSDTArb(props.toAsset) && (
-              <TradingInputError intent="warning">
-                {t(
-                  'The majority of markets on the network settle in USDT Arb. Are you sure you wish to deposit the selected asset?'
-                )}
-              </TradingInputError>
             )}
             {props.toAsset && (
               <FormSecondaryActionWrapper>
