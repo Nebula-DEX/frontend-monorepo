@@ -90,7 +90,7 @@ function AppBody({ Component }: AppProps) {
       <ToastsManager />
       <TransactionHandlers />
       <PartyActiveOrdersHandler />
-      <div className="hidden lg:block absolute bottom-1.5 pb-px right-2 z-10">
+      <div className="hidden lg:block fixed bottom-1.5 pb-px right-2 z-10">
         <NodeHealthContainer />
       </div>
     </>
