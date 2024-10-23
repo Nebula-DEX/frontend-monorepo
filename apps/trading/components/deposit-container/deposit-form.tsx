@@ -15,6 +15,7 @@ import * as Fields from './fields';
 import { FeedbackDialog, SquidFeedbackDialog } from './feedback-dialog';
 import { type TxDeposit, type TxSquidDeposit } from '../../stores/evm';
 import { useDepositForm } from './use-deposit-form';
+import { APP_TOKEN_ID } from '../../lib/constants';
 
 export const DepositForm = (props: {
   squid: Squid;
@@ -42,22 +43,6 @@ export const DepositForm = (props: {
   return (
     <FormProvider {...form}>
       <form data-testid="deposit-form" onSubmit={onSubmit}>
-        <Fields.FromAddress control={form.control} />
-        <Fields.FromChain
-          control={form.control}
-          chains={props.squid.chains}
-          tokens={props.squid.tokens}
-        />
-        <Fields.FromAsset
-          control={form.control}
-          tokens={tokens}
-          chain={chain}
-        />
-        <Fields.Amount
-          control={form.control}
-          balanceOf={balances.data?.balanceOf}
-          nativeBalanceOf={nativeBalance.data}
-        />
         <Fields.ToPubKeySelect control={form.control} pubKeys={pubKeys} />
         <Fields.ToAsset
           control={form.control}
@@ -65,6 +50,26 @@ export const DepositForm = (props: {
           toAsset={toAsset}
           queryKey={balances.queryKey}
           route={route.data?.route}
+        />
+        <Fields.FromAddress control={form.control} />
+        {toAsset?.id !== APP_TOKEN_ID && (
+          <>
+            <Fields.FromChain
+              control={form.control}
+              chains={props.squid.chains}
+              tokens={props.squid.tokens}
+            />
+            <Fields.FromAsset
+              control={form.control}
+              tokens={tokens}
+              chain={chain}
+            />
+          </>
+        )}
+        <Fields.Amount
+          control={form.control}
+          balanceOf={balances.data?.balanceOf}
+          nativeBalanceOf={nativeBalance.data}
         />
         {isSwap && (
           <div className="mb-4">

@@ -37,6 +37,7 @@ import { useEffect } from 'react';
 import {
   ETHEREUM_ADDRESS_REGEX,
   VEGA_ID_REGEX,
+  addDecimalsFormatNumber,
   removeDecimal,
   toBigNum,
 } from '@vegaprotocol/utils';
@@ -292,7 +293,13 @@ const WithdrawForm = ({
                   const asset = a.asset as AssetERC20;
                   return (
                     <TradingRichSelectOption value={asset.id} key={asset.id}>
-                      <AssetOption asset={asset} balance={a.balance} />
+                      <AssetOption
+                        asset={asset}
+                        balance={addDecimalsFormatNumber(
+                          a.balance,
+                          asset.decimals
+                        )}
+                      />
                     </TradingRichSelectOption>
                   );
                 })}
