@@ -77,7 +77,7 @@ type PennantCandle = {
 /**
  * A data access object that provides access to the Vega GraphQL API.
  */
-export class VegaDataSource implements DataSource {
+export class VegaDataSourceV2 implements DataSource {
   apolloClient: ApolloClient<object>;
   client: QueryClient;
   from?: Date;
@@ -185,23 +185,11 @@ export class VegaDataSource implements DataSource {
   async query(interval: PennantInterval, from: string) {
     try {
       this.from = new Date(from);
-      // const { data } = await this.apolloClient.query<
-      //   CandlesQuery,
-      //   CandlesQueryVariables
-      // >({
-      //   query: CandlesDocument,
-      //   variables: {
-      //     marketId: this.marketId,
-      //     interval: INTERVAL_TO_PENNANT_MAP[interval],
-      //     since: from,
-      //   },
-      //   fetchPolicy: 'no-cache',
-      // });
       const data = await this.client.fetchQuery(
         candleDataQueryOptionsV2({
           marketId: this.marketId,
           interval: INTERVAL_TO_SEC_MAP[interval],
-          fromTimestamp: from,
+          fromTimestamp: this.from.getTime().toString(),
         })
       );
 

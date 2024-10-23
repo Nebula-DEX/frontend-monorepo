@@ -45,10 +45,17 @@ export function candleDataQueryOptionsV2(params: {
 
 export async function retrieveCandleDataV2(params: QueryParams) {
   const pathparams = parametersSchema.parse(params);
+  const base = 'https://candles.neb.exchange';
+  const url = new URL(base);
+  url.pathname = [
+    'data',
+    pathparams.marketId,
+    pathparams.interval,
+    pathparams.fromTimestamp,
+    pathparams.toTimestamp,
+  ].join('/');
 
-  const result = await axios.get(
-    `https://candles.neb.exchange/data/${pathparams.marketId}/${pathparams.interval}/${pathparams.fromTimestamp}/${pathparams.toTimestamp}`
-  );
+  const result = await axios.get(url.href);
 
   return candlesSchema.parse(result.data);
 }
