@@ -15,7 +15,7 @@ import {
   DefaultBadge,
   PendingBadge,
 } from '../transaction-dialog/transaction-badge';
-import { DEFAULT_DISPLAY_DPS } from './contants';
+import { DEFAULT_DISPLAY_DPS } from '../../lib/constants';
 
 type FeedbackDialogProps = {
   data?: TxDeposit;

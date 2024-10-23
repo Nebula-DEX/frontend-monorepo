@@ -15,3 +15,5 @@ export const ONBOARDING_TARGET_ASSET = APP_TOKEN_ID;
 // be done if the swap was not successfull
 export const SQUID_RECEIVER_ADDRESS =
   '0xE7477a9aDb9BA0d00Af8f4d8e5E53A532C650ffa' as Address;
+
+export const DEFAULT_DISPLAY_DPS = 2;

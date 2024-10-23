@@ -3,9 +3,9 @@ import { type AssetERC20 } from '@vegaprotocol/assets';
 import { Emblem } from '@vegaprotocol/emblem';
 import { truncateMiddle } from '@vegaprotocol/ui-toolkit';
 import { addDecimalsFormatNumber, isAssetNative } from '@vegaprotocol/utils';
-import { getErc20Abi } from 'apps/trading/lib/utils/get-erc20-abi';
+import { getErc20Abi } from '../../lib/utils/get-erc20-abi';
 import { useAccount, useBalance, useReadContracts } from 'wagmi';
-import { DEFAULT_DISPLAY_DPS } from '../deposit-container/contants';
+import { DEFAULT_DISPLAY_DPS } from '../../lib/constants';
 
 export const AssetOption = ({
   asset,

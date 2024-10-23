@@ -47,7 +47,7 @@ import { AccountType } from '@vegaprotocol/types';
 import { BRIDGE_ABI } from '@vegaprotocol/smart-contracts';
 
 import { useT } from '../../lib/use-t';
-import { APP_TOKEN_ID } from '../../lib/constants';
+import { APP_TOKEN_ID, DEFAULT_DISPLAY_DPS } from '../../lib/constants';
 
 import {
   FormSecondaryActionButton,
@@ -297,7 +297,8 @@ const WithdrawForm = ({
                         asset={asset}
                         balance={addDecimalsFormatNumber(
                           a.balance,
-                          asset.decimals
+                          asset.decimals,
+                          DEFAULT_DISPLAY_DPS
                         )}
                       />
                     </TradingRichSelectOption>

@@ -22,7 +22,7 @@ import { type QueryKey } from '@tanstack/react-query';
 import { type RouteResponse } from '@0xsquid/sdk/dist/types';
 import { addDecimalsFormatNumber } from '@vegaprotocol/utils';
 import { TokenOption } from '../token-option';
-import { DEFAULT_DISPLAY_DPS } from '../contants';
+import { DEFAULT_DISPLAY_DPS } from '../../../lib/constants';
 
 export function ToAsset(props: {
   control: Control<FormFields>;
