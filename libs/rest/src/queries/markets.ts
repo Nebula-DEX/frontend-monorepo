@@ -14,6 +14,9 @@ import { type Assets, erc20AssetSchema, getAssets } from './assets';
 import { queryOptions, type QueryClient } from '@tanstack/react-query';
 import { getBaseUnit, getQuoteUnit } from '@vegaprotocol/markets';
 
+const marketState = z.nativeEnum(vegaMarketState);
+export type MarketState = z.infer<typeof marketState>;
+
 const baseSchema = z.object({
   id: z.string(),
   code: z.string(),
@@ -25,8 +28,9 @@ const baseSchema = z.object({
   liquidityFee: z.number(),
   settlementAsset: erc20AssetSchema,
   data: z.object({
-    state: z.nativeEnum(vegaMarketState),
+    state: marketState,
   }),
+  metatags: z.array(z.string()),
 });
 
 const futureSchema = baseSchema.extend({
@@ -170,6 +174,7 @@ function mapMarket(m: vegaMarket, assets: Assets) {
     data: {
       state: m.state,
     },
+    metatags: m.tradableInstrument?.instrument?.metadata?.tags || [],
   };
 }
 
