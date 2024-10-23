@@ -3,6 +3,7 @@ import { useTotalValueLocked } from './use-total-volume-locked';
 import { createAssetFields } from '@vegaprotocol/mock';
 import { useAssets } from '@vegaprotocol/rest';
 import { useReadContracts } from 'wagmi';
+import { APP_TOKEN_ID } from '../constants';
 
 jest.mock('wagmi', () => ({
   useReadContracts: jest.fn(),
@@ -16,9 +17,21 @@ describe('useTotalValueLocked', () => {
   it('calculates TVL correctly', () => {
     (useAssets as jest.Mock).mockReturnValue({
       data: [
-        createAssetFields({ quantum: '1000000', decimals: 6 }),
-        createAssetFields({ quantum: '1000000', decimals: 6 }),
-        createAssetFields({ quantum: '1000000', decimals: 6 }),
+        createAssetFields({
+          id: APP_TOKEN_ID,
+          quantum: '1000000',
+          decimals: 6,
+        }),
+        createAssetFields({
+          id: APP_TOKEN_ID,
+          quantum: '1000000',
+          decimals: 6,
+        }),
+        createAssetFields({
+          id: APP_TOKEN_ID,
+          quantum: '1000000',
+          decimals: 6,
+        }),
       ],
     });
     (useReadContracts as jest.Mock).mockReturnValue({
@@ -35,9 +48,13 @@ describe('useTotalValueLocked', () => {
   it('handles different quantums', () => {
     (useAssets as jest.Mock).mockReturnValue({
       data: [
-        createAssetFields({ quantum: '100', decimals: 2 }),
-        createAssetFields({ quantum: '10000', decimals: 4 }),
-        createAssetFields({ quantum: '1000000', decimals: 6 }),
+        createAssetFields({ id: APP_TOKEN_ID, quantum: '100', decimals: 2 }),
+        createAssetFields({ id: APP_TOKEN_ID, quantum: '10000', decimals: 4 }),
+        createAssetFields({
+          id: APP_TOKEN_ID,
+          quantum: '1000000',
+          decimals: 6,
+        }),
       ],
     });
     (useReadContracts as jest.Mock).mockReturnValue({
