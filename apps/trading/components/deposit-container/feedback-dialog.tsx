@@ -15,6 +15,7 @@ import {
   DefaultBadge,
   PendingBadge,
 } from '../transaction-dialog/transaction-badge';
+import { DEFAULT_DISPLAY_DPS } from '../../lib/constants';
 
 type FeedbackDialogProps = {
   data?: TxDeposit;
@@ -45,7 +46,11 @@ const Content = (props: { tx: TxDeposit }) => {
           {t('Deposit')} <br />
           {data && data.asset && (
             <span className="text-surface-1-fg text-2xl">
-              {addDecimalsFormatNumber(data.amount, data.asset.decimals)}{' '}
+              {addDecimalsFormatNumber(
+                data.amount,
+                data.asset.decimals,
+                DEFAULT_DISPLAY_DPS
+              )}{' '}
               {data.asset.symbol}
             </span>
           )}

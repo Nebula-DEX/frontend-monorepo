@@ -7,6 +7,7 @@ import {
   toBigNum,
   removeDecimal,
   addDecimalsFormatNumber,
+  formatNumber,
 } from '@vegaprotocol/utils';
 import { useT } from './use-t';
 import {
@@ -31,6 +32,8 @@ import { AccountType, AccountTypeMapping } from '@vegaprotocol/types';
 import { useTransferFeeQuery } from './__generated__/TransferFee';
 import { normalizeTransfer } from './utils';
 import { Emblem } from '@vegaprotocol/emblem';
+
+const DEFAULT_DISPLAY_DPS = 2;
 
 interface FormFields {
   toVegaKey: string;
@@ -607,7 +610,9 @@ const AssetOption = ({
             : asset.source.__typename}
         </div>
       </div>
-      <div className="ml-auto text-sm">{asset.balance}</div>
+      <div className="ml-auto text-sm">
+        {formatNumber(asset.balance, DEFAULT_DISPLAY_DPS)}
+      </div>
     </div>
   );
 };

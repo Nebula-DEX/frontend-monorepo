@@ -3,8 +3,9 @@ import { type AssetERC20 } from '@vegaprotocol/assets';
 import { Emblem } from '@vegaprotocol/emblem';
 import { truncateMiddle } from '@vegaprotocol/ui-toolkit';
 import { addDecimalsFormatNumber, isAssetNative } from '@vegaprotocol/utils';
-import { getErc20Abi } from 'apps/trading/lib/utils/get-erc20-abi';
+import { getErc20Abi } from '../../lib/utils/get-erc20-abi';
 import { useAccount, useBalance, useReadContracts } from 'wagmi';
+import { DEFAULT_DISPLAY_DPS } from '../../lib/constants';
 
 export const AssetOption = ({
   asset,
@@ -52,7 +53,15 @@ const NativeTokenBalance = (props: AssetBalanceProps) => {
 
   if (!data) return null;
 
-  return <>{addDecimalsFormatNumber(data.value.toString(), data.decimals)}</>;
+  return (
+    <>
+      {addDecimalsFormatNumber(
+        data.value.toString(),
+        data.decimals,
+        DEFAULT_DISPLAY_DPS
+      )}
+    </>
+  );
 };
 
 const TokenBalance = (props: AssetBalanceProps) => {
@@ -85,5 +94,9 @@ const TokenBalance = (props: AssetBalanceProps) => {
 
   if (!value || !decimals) return null;
 
-  return <>{addDecimalsFormatNumber(value.toString(), decimals)}</>;
+  return (
+    <>
+      {addDecimalsFormatNumber(value.toString(), decimals, DEFAULT_DISPLAY_DPS)}
+    </>
+  );
 };
