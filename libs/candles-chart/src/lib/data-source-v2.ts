@@ -334,12 +334,13 @@ const checkGranulationContinuity =
     return agg;
   };
 
-const isValidBar = (bar: {
+const isValidBar = (bar?: {
   close: string | number;
   open: string | number;
   low: string | number;
   high: string | number;
 }) => {
+  if (!bar) return false;
   if (!bar.close) return false;
   if (!bar.open) return false;
   if (!bar.low) return false;
