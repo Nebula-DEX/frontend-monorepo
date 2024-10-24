@@ -6,7 +6,7 @@ import {
   type Interval,
   type Study,
 } from 'pennant';
-import { VegaDataSource } from './data-source';
+import { VegaDataSourceV2 } from './data-source-v2';
 import { useApolloClient } from '@apollo/client';
 import { useMemo } from 'react';
 import debounce from 'lodash/debounce';
@@ -14,6 +14,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { useVegaWallet } from '@vegaprotocol/wallet-react';
 import { useT } from './use-t';
 import { useThemeSwitcher } from '@vegaprotocol/react-helpers';
+import { useQueryClient } from '@tanstack/react-query';
 
 export type CandlesChartContainerProps = {
   marketId: string;
@@ -42,7 +43,8 @@ export const CandlesChartContainer = ({
   setStudySizes,
   setOverlays,
 }: CandlesChartContainerProps) => {
-  const client = useApolloClient();
+  const client = useQueryClient();
+  const apolloClient = useApolloClient();
   const { pubKey } = useVegaWallet();
   const { theme } = useThemeSwitcher();
   const t = useT();
@@ -57,8 +59,8 @@ export const CandlesChartContainer = ({
   );
 
   const dataSource = useMemo(() => {
-    return new VegaDataSource(client, marketId, pubKey);
-  }, [client, marketId, pubKey]);
+    return new VegaDataSourceV2(client, apolloClient, marketId, pubKey);
+  }, [client, apolloClient, marketId, pubKey]);
 
   return (
     <AutoSizer>

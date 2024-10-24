@@ -5,7 +5,6 @@ import {
   useThemeSwitcher,
 } from '@vegaprotocol/react-helpers';
 import { useLanguage } from './use-t';
-import { useDatafeed } from './use-datafeed';
 import { type ResolutionString } from './constants';
 import {
   type ChartingLibraryFeatureset,
@@ -16,6 +15,7 @@ import {
   type ResolutionString as TVResolutionString,
   type Timezone,
 } from '../charting-library';
+import { useDatafeedV2 } from './use-datafeed-v2';
 
 const noop = () => {};
 
@@ -41,7 +41,7 @@ export const TradingView = ({
   const prevMarketId = usePrevious(marketId);
   const prevTheme = usePrevious(theme);
 
-  const datafeed = useDatafeed(marketId);
+  const datafeed = useDatafeedV2(marketId);
 
   useEffect(() => {
     // Widget already created

@@ -2,6 +2,7 @@ export { useAccounts, useSuspenseAccounts } from './use-accounts';
 export { useAMM, useAMMs } from './use-amms';
 export { useAsset, useAssets, useSuspenseAssets } from './use-assets';
 export { useCandles } from './use-candles';
+export { useCandlesV2 } from './use-candles-v2';
 export { useLiquidityFees, useMakerFees } from './use-fees';
 export {
   useLiquidityProviders,
