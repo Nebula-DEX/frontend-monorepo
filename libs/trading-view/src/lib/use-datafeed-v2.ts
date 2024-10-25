@@ -149,9 +149,9 @@ export const useDatafeedV2 = (marketId: string) => {
             candleDataQueryOptionsV2({
               marketId: symbolInfo.ticker,
               interval: resolutionSecMap[resolution],
-              fromTimestamp: String(
-                unixTimestampToDate(periodParams.from).getTime()
-              ),
+              fromTimestamp: periodParams.firstDataRequest
+                ? '1'
+                : String(unixTimestampToDate(periodParams.from).getTime()),
               toTimestamp: String(
                 unixTimestampToDate(periodParams.to).getTime()
               ),
