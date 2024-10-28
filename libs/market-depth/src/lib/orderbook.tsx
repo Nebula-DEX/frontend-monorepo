@@ -87,7 +87,7 @@ const OrderbookSide = ({
 };
 
 export const OrderbookMid = ({
-  lastTradedPrice,
+  midPrice,
   decimalPlaces,
   assetSymbol,
   bestAskPrice,
@@ -95,7 +95,7 @@ export const OrderbookMid = ({
   indicativePrice,
   isMarketInAuction,
 }: {
-  lastTradedPrice: string;
+  midPrice: string;
   decimalPlaces: number;
   assetSymbol: string;
   bestAskPrice?: string;
@@ -104,7 +104,7 @@ export const OrderbookMid = ({
   isMarketInAuction: boolean;
 }) => {
   const t = useT();
-  const currentPrice = isMarketInAuction ? indicativePrice : lastTradedPrice;
+  const currentPrice = isMarketInAuction ? indicativePrice : midPrice;
   const previousPrice = usePrevious(currentPrice);
   const priceChangeRef = useRef<'up' | 'down' | 'none'>('none');
   const spread =
@@ -154,7 +154,7 @@ export const OrderbookMid = ({
               : t('Last traded price')
           }
         >
-          {addDecimalsFormatNumber(lastTradedPrice, decimalPlaces)}
+          {addDecimalsFormatNumber(midPrice, decimalPlaces)}
         </span>
         <span>{assetSymbol}</span>
         {spread && !spread.startsWith('-') && (
@@ -171,7 +171,7 @@ export const OrderbookMid = ({
             description={t(
               'Market is in auction. Crossed orders are highlighted on the book, currently estimated to uncross at {{price}}',
               {
-                price: addDecimalsFormatNumber(lastTradedPrice, decimalPlaces),
+                price: addDecimalsFormatNumber(midPrice, decimalPlaces),
               }
             )}
           >
@@ -190,6 +190,7 @@ interface OrderbookProps {
   positionDecimalPlaces: number;
   onClick: (args: { price?: string; size?: string }) => void;
   lastTradedPrice: string;
+  midPrice: string;
   bids: PriceLevel[];
   asks: PriceLevel[];
   assetSymbol: string;
@@ -202,6 +203,7 @@ export const Orderbook = ({
   positionDecimalPlaces,
   onClick,
   lastTradedPrice,
+  midPrice,
   asks,
   bids,
   assetSymbol,
@@ -274,7 +276,7 @@ export const Orderbook = ({
                       bestBidPrice={bidRows[0]?.price}
                     />
                     <OrderbookMid
-                      lastTradedPrice={lastTradedPrice}
+                      midPrice={midPrice}
                       decimalPlaces={decimalPlaces}
                       assetSymbol={assetSymbol}
                       bestAskPrice={bestAskPrice}

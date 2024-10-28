@@ -54,6 +54,7 @@ export const OrderbookManager = ({
           assetSymbol={getQuoteName(market)}
           onClick={onClick}
           lastTradedPrice={marketData.lastTradedPrice}
+          midPrice={marketData.midPrice}
           indicativePrice={marketData.indicativePrice}
           isMarketInAuction={isMarketInAuction(marketData.marketTradingMode)}
         />
