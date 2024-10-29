@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Interval } from '@vegaprotocol/types';
 import { getMarketExpiryDate } from '@vegaprotocol/utils';
-import {
-  type IBasicDataFeed,
-  type DatafeedConfiguration,
-  type LibrarySymbolInfo,
-  type ResolutionString,
+import type {
+  IBasicDataFeed,
+  DatafeedConfiguration,
+  LibrarySymbolInfo,
+  ResolutionString,
+  Timezone,
 } from '../charting-library';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -106,6 +107,9 @@ export const useDatafeedV2 = (marketId: string) => {
             : market.data.state !== 'STATE_ACTIVE' &&
               market.data.state !== 'STATE_SUSPENDED';
 
+          const timezone = market.timezone || 'Etc/UTC';
+          const session = market.session || '24x7';
+
           const symbolInfo: LibrarySymbolInfo = {
             ticker: market.id, // use ticker as our unique identifier so that code/name can be used for name/description
             name: market.code,
@@ -116,8 +120,8 @@ export const useDatafeedV2 = (marketId: string) => {
             expiration_date: expirationTimestamp,
             format: 'price',
             type,
-            session: '24x7',
-            timezone: 'Etc/UTC',
+            session,
+            timezone: timezone as Timezone,
             exchange: EXCHANGE,
             minmov: 1,
             pricescale: Number('1' + '0'.repeat(market.decimalPlaces)), // for number of decimal places

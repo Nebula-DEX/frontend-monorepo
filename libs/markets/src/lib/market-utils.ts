@@ -97,6 +97,16 @@ export const getQuoteName = (market: Pick<Market, 'tradableInstrument'>) => {
   throw new Error('Failed to retrieve quoteName. Invalid product type');
 };
 
+export const getSession = (market: Market) => {
+  return getSessionFromTags(market.tradableInstrument.instrument.metadata.tags);
+};
+
+export const getTimezone = (market: Market) => {
+  return getTimezoneFromTags(
+    market.tradableInstrument.instrument.metadata.tags
+  );
+};
+
 export const sumFeesFactors = (fees: Market['fees']['factors']) => {
   if (!fees) return;
 
@@ -307,6 +317,32 @@ export const getQuoteUnit = (tags?: string[] | null) => {
   if (!value) {
     throw new Error(`could not get quote unit from tags: ${tags?.join(', ')}`);
   }
+
+  return value;
+};
+
+export const getSessionFromTags = (tags?: string[] | null) => {
+  const value = tags
+    ?.find((tag) => tag.startsWith('session:'))
+    ?.replace(/^[^:]*:/, '');
+
+  // TODO: make this required when markers are set up
+  // if (!value) {
+  //   throw new Error(`count not get session from tags: ${tags?.join(', ')}`);
+  // }
+
+  return value;
+};
+
+export const getTimezoneFromTags = (tags?: string[] | null) => {
+  const value = tags
+    ?.find((tag) => tag.startsWith('timezone:'))
+    ?.replace(/^[^:]*:/, '');
+
+  // TODO: make this required when markers are set up
+  // if (!value) {
+  //   throw new Error(`count not get timezone from tags: ${tags?.join(', ')}`);
+  // }
 
   return value;
 };

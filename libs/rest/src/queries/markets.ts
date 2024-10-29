@@ -12,25 +12,64 @@ import keyBy from 'lodash/keyBy';
 import { z } from 'zod';
 import { type Assets, erc20AssetSchema, getAssets } from './assets';
 import { queryOptions, type QueryClient } from '@tanstack/react-query';
-import { getBaseUnit, getQuoteUnit } from '@vegaprotocol/markets';
+import {
+  getBaseUnit,
+  getQuoteUnit,
+  getSessionFromTags,
+  getTimezoneFromTags,
+} from '@vegaprotocol/markets';
 
 const marketState = z.nativeEnum(vegaMarketState);
 export type MarketState = z.infer<typeof marketState>;
 
 const baseSchema = z.object({
   id: z.string(),
+
+  /** Short code of the market */
   code: z.string(),
+
+  /** Long name for the market */
   name: z.string(),
+
+  /** Number of decimal places used for order price */
   decimalPlaces: z.number(),
+
+  /** Number of decimal places used for order size */
   positionDecimalPlaces: z.number(),
+
+  /** Base symbol, eg XAU in XAU/USD */
   baseSymbol: z.string(),
+
+  /** Quote symbol, eg USD in XAU/USD */
   quoteSymbol: z.string(),
+
+  /** Liquidity fee factor */
   liquidityFee: z.number(),
+
+  /** Asset the market settles in */
   settlementAsset: erc20AssetSchema,
+
+  /** Live data which can get updated frequently */
   data: z.object({
     state: marketState,
   }),
+
+  /**
+   * Metadata which can be anything but also contains reserved
+   * patterns for required information:
+   *
+   * base:XAU
+   * quote:USD
+   * timezone:Europe/Berlin https://www.tradingview.com/charting-library-docs/latest/ui_elements/timezones
+   * session:24x7 https://www.tradingview.com/charting-library-docs/latest/connecting_data/Trading-Sessions
+   */
   metatags: z.array(z.string()),
+
+  /** Timezone for the market, set in metatags */
+  timezone: z.string().optional(),
+
+  /** Trading session (eg. 24x7 or Mon-Fri 0900-1700) */
+  session: z.string().optional(),
 });
 
 const futureSchema = baseSchema.extend({
@@ -123,12 +162,12 @@ function mapMarket(m: vegaMarket, assets: Assets) {
   let baseAsset;
   let quoteAsset;
 
-  let baseSymbol = getBaseUnit(
-    get(m, 'tradableInstrument.instrument.metadata.tags', [])
-  );
-  let quoteSymbol = getQuoteUnit(
-    get(m, 'tradableInstrument.instrument.metadata.tags', [])
-  );
+  const tags = get(m, 'tradableInstrument.instrument.metadata.tags', []);
+
+  let baseSymbol = getBaseUnit(tags);
+  let quoteSymbol = getQuoteUnit(tags);
+  const timezone = getTimezoneFromTags(tags);
+  const session = getSessionFromTags(tags);
 
   if (m.tradableInstrument?.instrument?.future) {
     type = 'future';
@@ -175,6 +214,8 @@ function mapMarket(m: vegaMarket, assets: Assets) {
       state: m.state,
     },
     metatags: m.tradableInstrument?.instrument?.metadata?.tags || [],
+    timezone,
+    session,
   };
 }
 

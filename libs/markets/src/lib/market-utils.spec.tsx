@@ -8,6 +8,8 @@ import {
   calcCandleVolumePrice,
   calcTradedFactor,
   filterAndSortMarkets,
+  getSession,
+  getTimezone,
   sumFeesFactors,
   totalFeesFactorsPercentage,
 } from './market-utils';
@@ -200,5 +202,63 @@ describe('calcCandleVolumePrice', () => {
     expect(
       calcCandleVolumePrice(candles, marketDecimals, positionDecimalPlaces)
     ).toEqual('0.002');
+  });
+});
+
+describe('getSession', () => {
+  it('gets the correct session', () => {
+    const session = '0000-0000';
+    expect(
+      getSession({
+        tradableInstrument: {
+          instrument: {
+            metadata: {
+              tags: [`session:${session}`, 'foo'],
+            },
+          },
+        },
+      } as Market)
+    ).toBe(session);
+
+    expect(
+      getSession({
+        tradableInstrument: {
+          instrument: {
+            metadata: {
+              tags: ['foo'],
+            },
+          },
+        },
+      } as Market)
+    ).toBeUndefined();
+  });
+});
+
+describe('getTimezone', () => {
+  it('gets the correct session', () => {
+    const timezone = 'Europe/Berlin';
+    expect(
+      getTimezone({
+        tradableInstrument: {
+          instrument: {
+            metadata: {
+              tags: [`timezone:${timezone}`, 'foo'],
+            },
+          },
+        },
+      } as Market)
+    ).toBe(timezone);
+
+    expect(
+      getTimezone({
+        tradableInstrument: {
+          instrument: {
+            metadata: {
+              tags: ['foo'],
+            },
+          },
+        },
+      } as Market)
+    ).toBeUndefined();
   });
 });
