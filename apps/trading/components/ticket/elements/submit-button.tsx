@@ -1,4 +1,10 @@
-import { cn, VegaIcon, VegaIconNames } from '@vegaprotocol/ui-toolkit';
+import {
+  Button,
+  cn,
+  Intent,
+  VegaIcon,
+  VegaIconNames,
+} from '@vegaprotocol/ui-toolkit';
 import { Side } from '@vegaprotocol/types';
 import { useForm } from '../use-form';
 import { useDialogStore, useWallet } from '@vegaprotocol/wallet-react';
@@ -68,13 +74,16 @@ export const SubmitButton = ({ text }: { text: string }) => {
   };
 
   if (!connected) {
-    p = {
-      type: 'button',
-      side: 'indeterminate',
-      disabled: false,
-      onClick: openDialog,
-      children: t('Connect'),
-    };
+    return (
+      <Button
+        type={'button' as const}
+        disabled={false}
+        onClick={openDialog}
+        intent={Intent.Primary}
+      >
+        {t('Connect')}
+      </Button>
+    );
   } else if (fundsLoading) {
     p = {
       type: 'button',
@@ -96,15 +105,18 @@ export const SubmitButton = ({ text }: { text: string }) => {
       ),
     };
   } else if (needsDeposit) {
-    p = {
-      type: 'button',
-      side: 'indeterminate',
-      disabled: false,
-      onClick: () => {
-        openDeposit(asset.id);
-      },
-      children: t('Deposit'),
-    };
+    return (
+      <Button
+        type={'button'}
+        disabled={false}
+        onClick={() => {
+          openDeposit(asset.id);
+        }}
+        intent={Intent.Primary}
+      >
+        {t('Deposit')}
+      </Button>
+    );
   } else {
     p = {
       type: 'submit',
@@ -120,14 +132,14 @@ export const SubmitButton = ({ text }: { text: string }) => {
       data-testid="place-order"
       {...omit(p, 'children', 'side')}
       className={cn(
-        'w-full h-12 flex flex-col justify-center items-center rounded-button-lg text-white p-2 transition-all',
+        'w-full h-10 flex flex-col justify-center items-center rounded-button-lg text-white p-2 transition-all',
         'relative',
         {
           'bg-red-500 enabled:hover:bg-red-550 dark:bg-red-600 dark:enabled:hover:bg-red-650':
             p.side === Side.SIDE_SELL,
           'bg-green-600 enabled:hover:bg-green-650 dark:bg-green-650 dark:enabled:hover:bg-green-600':
             p.side === Side.SIDE_BUY,
-          'bg-intent-secondary': p.side === 'indeterminate',
+          'bg-intent-primary': p.side === 'indeterminate',
         }
       )}
     >
