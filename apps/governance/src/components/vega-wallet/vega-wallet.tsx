@@ -6,7 +6,7 @@ import {
   AppStateActionType,
   useAppState,
 } from '../../contexts/app-state/app-state-context';
-import vegaWhite from '../../images/vega_white.png';
+import neb from '../../images/neb.png';
 import { BigNumber } from '../../lib/bignumber';
 import { truncateMiddle } from '../../lib/truncate-middle';
 import Routes from '../../routes/routes';
@@ -203,31 +203,31 @@ const VegaWalletConnected = ({ vegaKeys }: VegaWalletConnectedProps) => {
   return vegaKeys.length ? (
     <>
       <WalletCardAsset
-        image={vegaWhite}
+        image={neb}
         decimals={decimals}
-        name="VEGA"
+        name="Neb"
         subheading={t('Associated')}
-        symbol="VEGA"
+        symbol="NEB"
         balance={currentStakeAvailable}
         allowZeroBalance={true}
       />
       {totalPending.eq(0) ? null : (
         <>
           <WalletCardAsset
-            image={vegaWhite}
+            image={neb}
             decimals={decimals}
-            name="VEGA"
+            name="Neb"
             subheading={t('Pending association')}
-            symbol="VEGA"
+            symbol="NEB"
             balance={totalPending}
             allowZeroBalance={true}
           />
           <WalletCardAsset
-            image={vegaWhite}
+            image={neb}
             decimals={decimals}
-            name="VEGA"
+            name="Neb"
             subheading={t('Total associated after pending')}
-            symbol="VEGA"
+            symbol="NEB"
             balance={pendingStakeAmount}
             allowZeroBalance={true}
           />
