@@ -36,6 +36,7 @@ export const Routes = {
   INVITE_REFERRAL_CODE: '/invite?code=:code',
   INVITE_TEAM_CODE: '/invite?team=:code',
   INVITE_REFERRAL_CODE_AND_TEAM: '/invite?code=:code&team=:team',
+  BUY_NEB: '/buy-neb',
 } as const;
 
 type ConsoleLinks = {
@@ -88,4 +89,5 @@ export const Links: ConsoleLinks = {
       ':team',
       code
     ),
+  BUY_NEB: () => Routes.BUY_NEB,
 };
