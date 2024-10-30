@@ -180,6 +180,7 @@ export const generateMockData = ({
   return {
     asks: sell,
     bids: buy,
+    midPrice: lastTradedPrice,
     lastTradedPrice,
     bestStaticBidPrice: bestStaticBidPrice.toString(),
     bestStaticOfferPrice: bestStaticOfferPrice.toString(),
