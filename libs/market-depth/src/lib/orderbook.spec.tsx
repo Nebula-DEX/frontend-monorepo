@@ -179,6 +179,7 @@ describe('OrderbookRow', () => {
 describe('OrderbookMid', () => {
   const props = {
     lastTradedPrice: '100',
+    midPrice: '100',
     decimalPlaces: 0,
     assetSymbol: 'BTC',
     bestAskPrice: '101',
@@ -200,9 +201,7 @@ describe('OrderbookMid', () => {
     rerender(<OrderbookMid {...props} />);
     expect(screen.queryByTestId(/icon-/)).not.toBeInTheDocument();
 
-    rerender(
-      <OrderbookMid {...props} lastTradedPrice="101" bestAskPrice="102" />
-    );
+    rerender(<OrderbookMid {...props} midPrice="101" bestAskPrice="102" />);
     expect(screen.getByTestId('icon-arrow-up')).toBeInTheDocument();
     expect(screen.getByTestId('spread')).toHaveTextContent('(3)');
 
@@ -210,7 +209,7 @@ describe('OrderbookMid', () => {
     rerender(
       <OrderbookMid
         {...props}
-        lastTradedPrice="101"
+        midPrice="101"
         bestAskPrice="102"
         bestBidPrice="98"
       />
@@ -218,7 +217,7 @@ describe('OrderbookMid', () => {
     expect(screen.getByTestId('icon-arrow-up')).toBeInTheDocument();
     expect(screen.getByTestId('spread')).toHaveTextContent('(4)');
 
-    rerender(<OrderbookMid {...props} lastTradedPrice="100" />);
+    rerender(<OrderbookMid {...props} midPrice="100" />);
     expect(screen.getByTestId('icon-arrow-down')).toBeInTheDocument();
   });
 
