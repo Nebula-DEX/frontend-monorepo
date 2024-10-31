@@ -1,4 +1,8 @@
-import { type SVGAttributes, type ComponentType } from 'react';
+import {
+  type SVGAttributes,
+  type ComponentType,
+  type ImgHTMLAttributes,
+} from 'react';
 import { GoldYen } from './gold-yen';
 import { GoldYuan } from './gold-yuan';
 import { GoldGbp } from './gold-gbp';
@@ -18,10 +22,12 @@ import { Dax40 } from './dax40';
 import { Ftse } from './ftse';
 import { Nikkei } from './nikkei';
 import { Hangseng } from './hangseng';
+import { NebSpot } from './neb-spot';
 
 export const marketIcons: Record<
   string,
-  ComponentType<SVGAttributes<SVGElement>>
+  | ComponentType<SVGAttributes<SVGElement>>
+  | ComponentType<ImgHTMLAttributes<HTMLImageElement>>
 > = {
   c256ac0206dd6c4b2c443acd4590b156fc4f0f6963806780a374f1202cc68e85: GoldYuan,
   b47b9a2c8a9f69c01a54093ed81083f712ec88e98a0cc1358a621be3e8632116: Xau,
@@ -43,4 +49,5 @@ export const marketIcons: Record<
   f4131d11f6294172a6f9526d1bf0eee832846a47e3f30a759948dfdb7659198a: Eth,
   b0e849d267dc8b1e543a2109885b9f9dba600a733a3b30595e93e772862b6cb1: NaturalGas,
   '90cbdea8d4986173b2fbcbbec1fe7565e7fc1e3aa60b3ccb0e9d1a5a9eb18f19': Wheat,
+  '13af1d3e06d639f2973ec108d0d4ce0aa8fe77a4f5c29891aec3abe329fb1fa0': NebSpot,
 };
