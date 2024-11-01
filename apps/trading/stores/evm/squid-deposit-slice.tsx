@@ -35,6 +35,7 @@ type SquidDepositData = {
   routeData: RouteResponse;
   hash?: string;
   receipt?: ethers.providers.TransactionReceipt;
+  result?: Deposit;
 };
 
 export type TxSquidDeposit = Omit<TxCommon, 'status'> & {
@@ -87,6 +88,7 @@ export const createEvmSquidDepositSlice = (
           amount: config.amount,
           toPubKey: config.toPubKey,
           routeData: config.routeData,
+          result: undefined,
         },
       };
 
@@ -141,9 +143,9 @@ export const createEvmSquidDepositSlice = (
         ),
       });
 
-      await waitForDepositEvent(config);
+      const result = await waitForDepositEvent(config);
 
-      get().setTx(id, { status: 'finalized' });
+      get().setTx(id, { status: 'finalized', data: { result } });
       useToasts.getState().update(id, {
         intent: Intent.Success,
         content: (
@@ -171,12 +173,20 @@ export const createEvmSquidDepositSlice = (
   },
 });
 
+type Deposit = {
+  id: string;
+  amount: string;
+  status: DepositStatus;
+  txHash?: string | null;
+};
 /**
  * Start a subscription and find the next deposit for the current pubkey and asset
  * We can't check Deposit.txHash because the initial tx hash from the initial squid
  * transaction is not the same as the final tx hash on the destination chain
  */
-const waitForDepositEvent = async (config: SquidDepositConfig) => {
+const waitForDepositEvent = async (
+  config: SquidDepositConfig
+): Promise<Deposit> => {
   const apolloClient = getApolloClient();
 
   return new Promise((resolve) => {
@@ -210,7 +220,7 @@ const waitForDepositEvent = async (config: SquidDepositConfig) => {
           event.event.status === DepositStatus.STATUS_FINALIZED
         ) {
           sub.unsubscribe();
-          resolve(true);
+          resolve(event.event);
         }
       });
   });

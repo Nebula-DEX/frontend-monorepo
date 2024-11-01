@@ -1,3 +1,4 @@
+import { cn } from '@vegaprotocol/ui-toolkit';
 import {
   type AnchorHTMLAttributes,
   type ButtonHTMLAttributes,
@@ -17,7 +18,7 @@ export const FormSecondaryActionButton = (
     <button
       {...props}
       type="button"
-      className="text-xs underline underline-offset-4"
+      className={cn('text-xs underline underline-offset-4', props.className)}
     />
   );
 };

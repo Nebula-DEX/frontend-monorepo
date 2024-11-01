@@ -154,7 +154,12 @@ export const OrderbookMid = ({
               : t('Last traded price')
           }
         >
-          {addDecimalsFormatNumber(midPrice, decimalPlaces)}
+          <MidPrice
+            decimalPlaces={decimalPlaces}
+            midPrice={midPrice}
+            bestAsk={bestAskPrice}
+            bestBid={bestBidPrice}
+          />
         </span>
         <span>{assetSymbol}</span>
         {spread && !spread.startsWith('-') && (
@@ -183,6 +188,27 @@ export const OrderbookMid = ({
       </div>
     </div>
   );
+};
+
+const MidPrice = (props: {
+  decimalPlaces: number;
+  midPrice: string;
+  bestAsk?: string;
+  bestBid?: string;
+}) => {
+  if (props.midPrice !== '0') {
+    return <>{addDecimalsFormatNumber(props.midPrice, props.decimalPlaces)}</>;
+  }
+
+  if (props.bestAsk && !props.bestBid) {
+    return <>{addDecimalsFormatNumber(props.bestAsk, props.decimalPlaces)}</>;
+  }
+
+  if (props.bestBid && !props.bestAsk) {
+    return <>{addDecimalsFormatNumber(props.bestBid, props.decimalPlaces)}</>;
+  }
+
+  return <>-</>;
 };
 
 interface OrderbookProps {
