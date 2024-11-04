@@ -43,7 +43,7 @@ export const FeesBreakdown = ({
         label={t('Discount')}
         value={`${addDecimalsFormatNumber(
           estimate.discount.toString(),
-          decimals
+          2
         )} (${formatNumberPercentage(estimate.discountPct, 2)})`}
         testId="fee-discount"
       />
