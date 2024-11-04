@@ -36,7 +36,7 @@ export const FeesBreakdown = ({
     <dl className="grid grid-cols-2">
       <FeesBreakdownItem
         label={t('Fee')}
-        value={addDecimalsFormatNumber(estimate.fee.toString(), decimals)}
+        value={addDecimalsFormatNumber(estimate.fee.toString(), 2)}
         testId="fee"
       />
       <FeesBreakdownItem
@@ -49,10 +49,7 @@ export const FeesBreakdown = ({
       />
       <FeesBreakdownItem
         label={t('Discounted fee')}
-        value={addDecimalsFormatNumber(
-          estimate.feeDiscounted.toString(),
-          decimals
-        )}
+        value={addDecimalsFormatNumber(estimate.feeDiscounted.toString(), 2)}
         testId="discounted-fee"
       />
     </dl>
