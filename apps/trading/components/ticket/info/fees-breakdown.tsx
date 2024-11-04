@@ -25,7 +25,6 @@ const FeesBreakdownItem = ({
 
 export const FeesBreakdown = ({
   estimate,
-  decimals,
 }: {
   estimate: ReturnType<typeof useEstimateFees>;
   decimals: number;
