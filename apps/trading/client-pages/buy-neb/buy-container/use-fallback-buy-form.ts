@@ -3,28 +3,41 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useAccount, useChainId } from 'wagmi';
 
 import { type AssetERC20 } from '@vegaprotocol/assets';
-import { useVegaWallet } from '@vegaprotocol/wallet-react';
+import {
+  useSimpleTransaction,
+  useVegaWallet,
+} from '@vegaprotocol/wallet-react';
 
-import { useEvmDeposit } from '../../lib/hooks/use-evm-deposit';
-import { useAssetReadContracts } from '../../lib/hooks/use-asset-read-contracts';
+import { useEvmDeposit } from '../../../lib/hooks/use-evm-deposit';
+import { useAssetReadContracts } from '../../../lib/hooks/use-asset-read-contracts';
 
-// TODO: change this to show lifetime depositl limit only
-// import { Approval } from './approval';
 import {
   type FormFields,
   type Configs,
   fallbackFormSchema,
 } from './form-schema';
 import BigNumber from 'bignumber.js';
-import { type TxDeposit } from '../../stores/evm';
+import { type TxDeposit } from '../../../stores/evm';
+import { localLoggerFactory } from '@vegaprotocol/logger';
+import { MAX_BUY_USDT, SWAP_MARKET_ID } from './buy-container';
+import { OrderTimeInForce, OrderType, Side } from '@vegaprotocol/types';
+import { removeDecimal, toBigNum } from '@vegaprotocol/utils';
 
-export const useFallbackDepositForm = (props: {
+const logger = localLoggerFactory({ application: 'buy-neb-fallback' });
+
+export const useFallbackBuyForm = (props: {
   assets: Array<AssetERC20>;
   initialAsset?: AssetERC20;
   configs: Configs;
-  onDeposit?: (tx: TxDeposit) => void;
   minAmount?: string;
+  asks?: Array<{ price: string; volume: string; numberOfOrders: string }>;
+  market: {
+    decimalPlaces: number;
+    positionDecimalPlaces: number;
+  };
 }) => {
+  const bestAsk = props?.asks ? props.asks[0] : undefined;
+  const tx = useSimpleTransaction();
   const { pubKey } = useVegaWallet();
 
   const { address } = useAccount();
@@ -63,6 +76,31 @@ export const useFallbackDepositForm = (props: {
 
   const deposit = useEvmDeposit();
 
+  const executeSpotBuy = (res: TxDeposit) => {
+    if (!bestAsk) {
+      throw new Error('no asks on swap market book');
+    }
+
+    if (!res.data?.result) {
+      throw new Error('No resulting data from squid swap');
+    }
+
+    // amount of deposited arbitrum usdt
+    const amount = BigInt(res.data.result.amount);
+    const price = BigInt(bestAsk.price);
+    const size = String(amount / price);
+
+    const orderSubmission = {
+      marketId: SWAP_MARKET_ID,
+      side: Side.SIDE_BUY,
+      type: OrderType.TYPE_LIMIT,
+      price: bestAsk.price,
+      timeInForce: OrderTimeInForce.TIME_IN_FORCE_FOK,
+      size,
+    };
+    tx.send({ orderSubmission });
+  };
+
   const onSubmit = form.handleSubmit(async (fields) => {
     const toAsset = props.assets?.find((a) => a.id === fields.toAsset);
 
@@ -82,6 +120,13 @@ export const useFallbackDepositForm = (props: {
     // to asset is selected will get changed to the squid receiver address
     const bridgeAddress = config.collateral_bridge_contract.address;
 
+    if (Number(fields.amount) > MAX_BUY_USDT) {
+      form.setError('amount', {
+        message: 'Maximum of 100k permitted',
+      });
+      return;
+    }
+
     const res = await deposit.write({
       asset: toAsset,
       bridgeAddress: bridgeAddress as `0x${string}`,
@@ -92,16 +137,39 @@ export const useFallbackDepositForm = (props: {
       requiredConfirmations: config.confirmations,
     });
 
-    props.onDeposit && props.onDeposit(res);
+    if (res.status === 'finalized' && res.data?.result) {
+      executeSpotBuy(res);
+    } else {
+      logger.error(
+        `fallback deposit failed and spot buy could not be executed: ${JSON.stringify(
+          res
+        )}`
+      );
+    }
   });
+
+  // Estimate the final amount after deposit and swap
+  const amount = toAsset ? removeDecimal(fields.amount, toAsset.decimals) : 0;
+  const toAmount = BigInt(amount ?? 0); // Amount in USDT
+  const price = BigInt(bestAsk?.price ?? 0); // Price of NEB in USDT
+
+  // The estimated amount of NEB that will be received, note fees on spot market are set
+  // to 0 so this should be the final amount
+  const estimatedAmount = toBigNum(
+    String(toAmount / price),
+    props.market.positionDecimalPlaces
+  ).toString();
 
   return {
     form,
-
     toAsset,
+
     balances,
 
     deposit,
     onSubmit,
+    tx,
+    estimatedAmount,
+    bestAsk,
   };
 };

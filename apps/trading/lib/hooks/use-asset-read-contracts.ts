@@ -6,7 +6,7 @@ import { encodeAbiParameters, keccak256 } from 'viem';
 import { BRIDGE_ABI } from '@vegaprotocol/smart-contracts';
 import { type EVMBridgeConfig, type EthereumConfig } from '@vegaprotocol/web3';
 
-import { getErc20Abi } from '../../lib/utils/get-erc20-abi';
+import { getErc20Abi } from '../utils/get-erc20-abi';
 import { isAssetNative, toBigNum } from '@vegaprotocol/utils';
 
 export const useAssetReadContracts = ({

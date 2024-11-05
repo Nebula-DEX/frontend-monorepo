@@ -63,7 +63,7 @@ export const Error = ({ message }: { message?: string }) => {
     <>
       <ToastHeading>{t('Error occurred')}</ToastHeading>
       {message ? (
-        <p className="first-letter:uppercase break-all">{message}</p>
+        <p className="first-letter:uppercase break-all max-h-28">{message}</p>
       ) : (
         <p className="first-letter:uppercase">{t('Something went wrong')}</p>
       )}

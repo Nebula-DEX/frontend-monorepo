@@ -6,12 +6,12 @@ import { SQUID_RECEIVER_ABI, prepend0x } from '@vegaprotocol/smart-contracts';
 import { removeDecimal } from '@vegaprotocol/utils';
 import { type AssetERC20 } from '@vegaprotocol/assets';
 import { useQuery } from '@tanstack/react-query';
-import { useSquid } from '../../lib/hooks/use-squid';
+import { useSquid } from '../../../lib/hooks/use-squid';
 import { type FormFields, formSchema } from './form-schema';
 import { encodeFunctionData } from 'viem';
-import { getErc20Abi } from '../../lib/utils/get-erc20-abi';
-import { SQUID_RECEIVER_ADDRESS } from '../../lib/constants';
-import { useT } from '../../lib/use-t';
+import { getErc20Abi } from '../../../lib/utils/get-erc20-abi';
+import { SQUID_RECEIVER_ADDRESS } from '../../../lib/constants';
+import { useT } from '../../../lib/use-t';
 
 /**
  * Whenever the form changes use the squid sdk to fetch the swap route object

@@ -44,6 +44,7 @@ type DepositData = {
   approveReceipt?: TransactionReceipt;
   depositHash?: string;
   depositReceipt?: TransactionReceipt;
+  result?: Deposit;
 };
 
 export type TxDeposit = Omit<TxCommon, 'status'> & {
@@ -80,6 +81,7 @@ export const createEvmDepositSlice = (
           allowance,
           approvalRequired,
           pubKey: config.toPubKey,
+          result: undefined,
         },
       } as const;
 
@@ -202,10 +204,14 @@ export const createEvmDepositSlice = (
         ),
       });
 
-      await waitForDepositEvent({ pubKey: config.toPubKey, hash: depositHash });
+      const result = await waitForDepositEvent({
+        pubKey: config.toPubKey,
+        hash: depositHash,
+      });
 
       get().setTx(id, {
         status: 'finalized',
+        data: { result },
       });
       useToasts.getState().update(id, {
         intent: Intent.Success,
@@ -259,11 +265,21 @@ const waitForConfirmations = async (
   await waitForConfirmations(hash, requiredConfirmations);
 };
 
+type Deposit = {
+  id: string;
+  amount: string;
+  status: DepositStatus;
+  txHash?: string | null;
+};
+
 /**
  * Start a subscription and wait for the deposit event with the same txHash
  * so we can finalize the deposit
  */
-const waitForDepositEvent = async (args: { pubKey: string; hash: string }) => {
+const waitForDepositEvent = async (args: {
+  pubKey: string;
+  hash: string;
+}): Promise<Deposit> => {
   const apolloClient = getApolloClient();
 
   return new Promise((resolve) => {
@@ -294,7 +310,7 @@ const waitForDepositEvent = async (args: { pubKey: string; hash: string }) => {
           event.event.status === DepositStatus.STATUS_FINALIZED
         ) {
           sub.unsubscribe();
-          resolve(true);
+          resolve(event.event);
         }
       });
   });

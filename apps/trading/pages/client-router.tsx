@@ -30,6 +30,8 @@ import { CompetitionsCreateTeam } from '../client-pages/competitions/competition
 import { CompetitionsUpdateTeam } from '../client-pages/competitions/competitions-update-team';
 import { CompetitionsGame } from '../client-pages/competitions/competitions-game';
 import { Swap } from '../client-pages/swap/swap';
+import { Invite } from '../client-pages/invite';
+import { BuyNeb } from '../client-pages/buy-neb';
 import { NotFound } from '../client-pages/not-found';
 
 import { LayoutCentered, LayoutFull } from '../components/layouts';
@@ -42,7 +44,6 @@ import { Liquidity as MyLiquidity } from '../client-pages/amm/liquidity';
 import { ManageLiquidity } from '../client-pages/amm/pools/market/manage-liquidity';
 import { AmmWrapper } from '../client-pages/amm/amm-wrapper';
 import { useFeatureFlags } from '@vegaprotocol/environment';
-import { Invite } from '../client-pages/invite';
 
 // These must remain dynamically imported as pennant cannot be compiled by Next.js due to ESM
 // Using dynamic imports is a workaround for this until pennant is published as ESM
@@ -247,6 +248,14 @@ export const useRouterConfig = (): RouteObject[] => {
       element: (
         <LayoutCentered>
           <Invite />
+        </LayoutCentered>
+      ),
+    },
+    {
+      path: AppRoutes.BUY_NEB,
+      element: (
+        <LayoutCentered>
+          <BuyNeb />
         </LayoutCentered>
       ),
     },

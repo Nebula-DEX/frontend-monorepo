@@ -1,27 +1,36 @@
 import { useEVMBridgeConfigs, useEthereumConfig } from '@vegaprotocol/web3';
 
-import { DepositForm } from './deposit-form';
+import { BuyForm } from './buy-form';
 import { type AssetERC20, useEnabledAssets } from '@vegaprotocol/assets';
-import { useSquid } from '../../lib/hooks/use-squid';
-import { FallbackDepositForm } from './fallback-deposit-form';
-import { useT } from '../../lib/use-t';
+import { useSquid } from '../../../lib/hooks/use-squid';
+import { FallbackBuyForm } from './fallback-buy-form';
+import { useT } from '../../../lib/use-t';
 import { Networks, useEnvironment } from '@vegaprotocol/environment';
-import { type TxDeposit, type TxSquidDeposit } from '../../stores/evm';
+import { useOrderbook } from '@vegaprotocol/market-depth';
+import { useMarket } from '@vegaprotocol/rest';
+
+export const SWAP_MARKET_ID =
+  '13af1d3e06d639f2973ec108d0d4ce0aa8fe77a4f5c29891aec3abe329fb1fa0';
+export const MAX_BUY_USDT = 100_000;
 
 /**
  * Gets env vars, assets, and configs required for the deposit form
  */
-export const DepositContainer = (props: {
+export const BuyContainer = (props: {
+  address: string;
+  pubKey: string;
   initialAssetId?: string;
-  onDeposit?: (tx: TxDeposit | TxSquidDeposit) => void;
   minAmount?: string;
 }) => {
   const t = useT();
   const { VEGA_ENV } = useEnvironment();
   const { config } = useEthereumConfig();
   const { configs } = useEVMBridgeConfigs();
-  const { data: assets, loading } = useEnabledAssets();
+  const { data: assets, loading: assetsLoading } = useEnabledAssets();
   const { data: squid, error: squidError } = useSquid();
+  const { data: market, isLoading: marketLoading } = useMarket(SWAP_MARKET_ID);
+  const { data: book, loading: bookLoading } = useOrderbook(SWAP_MARKET_ID);
+  const lowestAskLvl = book?.depth?.sell ? book.depth.sell[0] : undefined;
 
   if (!config) return null;
   if (!configs?.length) return null;
@@ -31,10 +40,15 @@ export const DepositContainer = (props: {
   // Make sure asset is an existing enabled asset
   const asset = assets?.find((a) => a.id === props.initialAssetId);
 
-  if ((loading || !squid) && !squidError) {
+  const loading = assetsLoading || bookLoading || marketLoading || !squid;
+  if (loading && !squidError) {
     return (
       <p className="text-sm text-surface-1-fg-muted pt-2">{t('Loading...')}</p>
     );
+  }
+
+  if (!lowestAskLvl) {
+    return <p>{t('NEB is not currently available to buy')}</p>;
   }
 
   // If we have squid initialized show the form which allows swaps
@@ -45,13 +59,16 @@ export const DepositContainer = (props: {
     squid.initialized
   ) {
     return (
-      <DepositForm
+      <BuyForm
+        address={props.address}
+        pubKey={props.pubKey}
         squid={squid}
         assets={assets as AssetERC20[]}
         initialAsset={asset as AssetERC20}
         configs={allConfigs}
-        onDeposit={props.onDeposit}
         minAmount={props.minAmount}
+        asks={book?.depth.sell}
+        market={market}
       />
     );
   }
@@ -60,12 +77,13 @@ export const DepositContainer = (props: {
   // use a form which doesn't require squid, but also doesn't allow swaps,
   // which is better than noting
   return (
-    <FallbackDepositForm
+    <FallbackBuyForm
       assets={assets as AssetERC20[]}
       initialAsset={asset as AssetERC20}
       configs={allConfigs}
-      onDeposit={props.onDeposit}
       minAmount={props.minAmount}
+      asks={book?.depth.sell}
+      market={market}
     />
   );
 };

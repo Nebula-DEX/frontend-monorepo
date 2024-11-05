@@ -4,29 +4,48 @@ import { useAccount, useChainId } from 'wagmi';
 import { type Squid } from '@0xsquid/sdk';
 
 import { type AssetERC20 } from '@vegaprotocol/assets';
-import { useVegaWallet } from '@vegaprotocol/wallet-react';
 
-import { useAssetReadContracts } from '../../lib/hooks/use-asset-read-contracts';
+import { useAssetReadContracts } from '../../../lib/hooks/use-asset-read-contracts';
 import { useSquidRoute } from './use-squid-route';
 import { type FormFields, type Configs, formSchema } from './form-schema';
-import { useNativeBalance } from '../../lib/hooks/use-native-balance';
-import { useEvmDeposit } from '../../lib/hooks/use-evm-deposit';
+import { useNativeBalance } from '../../../lib/hooks/use-native-balance';
+import { useEvmDeposit } from '../../../lib/hooks/use-evm-deposit';
 import { useEvmSquidDeposit } from 'apps/trading/lib/hooks/use-evm-squid-deposit';
-import { type TxDeposit, type TxSquidDeposit } from '../../stores/evm';
+import { type TxDeposit, type TxSquidDeposit } from '../../../stores/evm';
 import BigNumber from 'bignumber.js';
+import { MAX_BUY_USDT, SWAP_MARKET_ID } from './buy-container';
+import { OrderTimeInForce, OrderType, Side } from '@vegaprotocol/types';
+import { useSimpleTransaction } from '@vegaprotocol/wallet-react';
+import { removeDecimal, toBigNum } from '@vegaprotocol/utils';
+import { localLoggerFactory } from '@vegaprotocol/logger';
+import { useT } from '../../../lib/use-t';
+
+const logger = localLoggerFactory({
+  application: 'buy-neb',
+  logLevel: 'debug',
+});
 
 /**
  * Form logic for deposits
  */
-export const useDepositForm = (props: {
+export const useBuyForm = (props: {
+  address: string;
+  pubKey: string;
   squid: Squid;
   assets: Array<AssetERC20>;
   initialAsset?: AssetERC20;
   configs: Configs;
   minAmount?: string;
-  onDeposit?: (tx: TxDeposit | TxSquidDeposit) => void;
+  asks?: Array<{ price: string; volume: string; numberOfOrders: string }>;
+  market: {
+    decimalPlaces: number;
+    positionDecimalPlaces: number;
+  };
 }) => {
-  const { pubKey } = useVegaWallet();
+  const t = useT();
+  const bestAsk = props?.asks ? props.asks[0] : undefined;
+  const tx = useSimpleTransaction();
+
   const { address } = useAccount();
 
   const chainId = useChainId();
@@ -37,14 +56,14 @@ export const useDepositForm = (props: {
   const form = useForm<FormFields>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      fromAddress: address,
+      fromAddress: props.address,
+      toPubKey: props.pubKey,
       fromChain: defaultChain && defaultChain.chainId,
       fromAsset: '',
       // fromAddress is just derived from the connected wallet, but including
       // it as a form field so its included with the zodResolver validation
       // and shows up as an error if its not set
       toAsset: props.initialAsset?.id,
-      toPubKey: pubKey,
       amount: '',
     },
   });
@@ -92,7 +111,36 @@ export const useDepositForm = (props: {
   const deposit = useEvmDeposit();
   const squidDeposit = useEvmSquidDeposit();
 
+  const executeSpotBuy = (res: TxDeposit | TxSquidDeposit) => {
+    if (!bestAsk) {
+      throw new Error('no asks on swap market book');
+    }
+
+    if (!res.data?.result) {
+      throw new Error('No resulting data from squid swap');
+    }
+
+    // amount of deposited arbitrum usdt
+    const amount = BigInt(res.data.result.amount);
+    const price = BigInt(bestAsk.price);
+    const size = String(amount / price);
+
+    const orderSubmission = {
+      marketId: SWAP_MARKET_ID,
+      side: Side.SIDE_BUY,
+      type: OrderType.TYPE_LIMIT,
+      price: bestAsk.price,
+      timeInForce: OrderTimeInForce.TIME_IN_FORCE_FOK,
+      size,
+    };
+    tx.send({ orderSubmission });
+  };
+
   const onSubmit = form.handleSubmit(async (fields) => {
+    if (!bestAsk) {
+      throw new Error('no asks on swap market book');
+    }
+
     // Get full details of the chosen assets
     const fromAsset = tokens.find(
       (t) => t.address === fields.fromAsset && t.chainId === fields.fromChain
@@ -117,6 +165,13 @@ export const useDepositForm = (props: {
         throw new Error('no route data');
       }
 
+      if (Number(route.data.route.estimate.toAmount) > MAX_BUY_USDT) {
+        form.setError('amount', {
+          message: t('Maximum of 100k USD permitted'),
+        });
+        return;
+      }
+
       const quantumizedAmount = BigNumber(
         route.data.route.estimate.toAmount
       ).div(toAsset.quantum);
@@ -132,11 +187,20 @@ export const useDepositForm = (props: {
       const res = await squidDeposit.write({
         asset: toAsset,
         amount: fields.amount.toString(),
-        toPubKey: fields.toPubKey,
+        toPubKey: props.pubKey,
         routeData: route.data,
         chainId: Number(fields.fromChain),
       });
-      props.onDeposit && props.onDeposit(res);
+
+      if (res.status === 'finalized' && res.data?.result) {
+        executeSpotBuy(res);
+      } else {
+        logger.error(
+          `squid deposit failed and spot buy could not be executed: ${JSON.stringify(
+            res
+          )}`
+        );
+      }
     } else {
       // Same asset, no swap required, use normal ethereum bridge
       // or normal arbitrum bridge to swap
@@ -150,19 +214,62 @@ export const useDepositForm = (props: {
         throw new Error(`no bridge for toAsset ${toAsset.id}`);
       }
 
+      if (Number(fields.amount) > MAX_BUY_USDT) {
+        form.setError('amount', {
+          message: t('Maximum of 100k USD permitted'),
+        });
+        return;
+      }
+
       const res = await deposit.write({
         asset: toAsset,
         bridgeAddress: config.collateral_bridge_contract
           .address as `0x${string}`,
         amount: fields.amount.toString(),
         allowance: (balances.data?.allowance || BigNumber(0)).toString(),
-        toPubKey: fields.toPubKey,
+        toPubKey: props.pubKey,
         chainId: Number(config.chain_id),
         requiredConfirmations: config.confirmations,
       });
-      props.onDeposit && props.onDeposit(res);
+
+      if (res.status === 'finalized' && res.data?.result) {
+        executeSpotBuy(res);
+      } else {
+        logger.error(
+          `normal deposit failed and spot buy could not be executed: ${JSON.stringify(
+            res
+          )}`
+        );
+      }
     }
   });
+
+  let estimatedAmount = '0';
+
+  if (isSwap) {
+    // Estimate the final amount after deposit and swap
+    const toAmount = BigInt(route.data?.route.estimate.toAmount ?? 0); // USDT
+    const price = BigInt(bestAsk?.price ?? 0); // Price of NEB in USDT
+
+    // The estimated amount of NEB that will be received, note fees on spot market are set
+    // to 0 so this should be the final amount
+    estimatedAmount = toBigNum(
+      String(toAmount / price),
+      props.market.positionDecimalPlaces
+    ).toString();
+  } else {
+    // Estimate the final amount after deposit and swap
+    const amount = toAsset ? removeDecimal(fields.amount, toAsset.decimals) : 0;
+    const toAmount = BigInt(amount ?? 0); // Amount in USDT
+    const price = BigInt(bestAsk?.price ?? 0); // Price of NEB in USDT
+
+    // The estimated amount of NEB that will be received, note fees on spot market are set
+    // to 0 so this should be the final amount
+    estimatedAmount = toBigNum(
+      String(toAmount / price),
+      props.market.positionDecimalPlaces
+    ).toString();
+  }
 
   return {
     form,
@@ -180,5 +287,8 @@ export const useDepositForm = (props: {
     deposit,
     squidDeposit,
     onSubmit,
+    tx,
+    estimatedAmount,
+    bestAsk,
   };
 };

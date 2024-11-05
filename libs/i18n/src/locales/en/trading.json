@@ -484,6 +484,7 @@
   "myVolume_other": "My volume (last {{count}} epochs)",
   "myVolume": "My volume (last {{count}} epochs)",
   "Name": "Name",
+  "NEB is not currently available to buy": "NEB is not currently available to buy",
   "Next payout at": "Next payout at",
   "Next update in {{time}}": "Next update in {{time}}",
   "No alias": "No alias",
