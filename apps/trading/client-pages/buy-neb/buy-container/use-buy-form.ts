@@ -165,7 +165,14 @@ export const useBuyForm = (props: {
         throw new Error('no route data');
       }
 
-      if (Number(route.data.route.estimate.toAmount) > MAX_BUY_USDT) {
+      // Final USDT amount needs converting as route data values are in
+      // raw integers
+      if (
+        toBigNum(
+          route.data.route.estimate.toAmount,
+          route.data.route.estimate.toToken.decimals
+        ).isGreaterThan(MAX_BUY_USDT)
+      ) {
         form.setError('amount', {
           message: t('Maximum of 100k USD permitted'),
         });
@@ -214,6 +221,8 @@ export const useBuyForm = (props: {
         throw new Error(`no bridge for toAsset ${toAsset.id}`);
       }
 
+      // Amount is the 'real' amount input by the user in this case
+      // as no swap has occurred
       if (Number(fields.amount) > MAX_BUY_USDT) {
         form.setError('amount', {
           message: t('Maximum of 100k USD permitted'),

@@ -120,6 +120,8 @@ export const useFallbackBuyForm = (props: {
     // to asset is selected will get changed to the squid receiver address
     const bridgeAddress = config.collateral_bridge_contract.address;
 
+    // No swap has occurred, so amount field is the raw user
+    // input amount in USDT
     if (Number(fields.amount) > MAX_BUY_USDT) {
       form.setError('amount', {
         message: 'Maximum of 100k permitted',
