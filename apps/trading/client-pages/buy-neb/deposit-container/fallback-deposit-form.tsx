@@ -13,6 +13,7 @@ import { FeedbackDialog } from './feedback-dialog';
 import { useFallbackDepositForm } from './use-fallback-deposit-form';
 import { getChainName } from '@vegaprotocol/web3';
 import { APP_SYMBOL } from 'apps/trading/lib/constants';
+import { NonSwapInfo } from './swap-info';
 
 export const FallbackDepositForm = (props: {
   assets: Array<AssetERC20>;
@@ -25,10 +26,17 @@ export const FallbackDepositForm = (props: {
     positionDecimalPlaces: number;
   };
 }) => {
-  const t = useT();
   const { pubKeys } = useVegaWallet();
-  const { form, balances, deposit, tx, estimatedAmount, toAsset, onSubmit } =
-    useFallbackDepositForm(props);
+  const {
+    form,
+    balances,
+    deposit,
+    tx,
+    estimatedAmount,
+    toAsset,
+    bestAsk,
+    onSubmit,
+  } = useFallbackDepositForm(props);
 
   let symbol = undefined;
   if (props.initialAsset) {
@@ -47,24 +55,15 @@ export const FallbackDepositForm = (props: {
           nativeBalanceOf={undefined}
           symbol={symbol}
         />
+        <div className="mb-4">
+          <NonSwapInfo
+            estimatedAmount={estimatedAmount}
+            bestAsk={bestAsk}
+            toAsset={toAsset}
+          />
+        </div>
         <SubmitButton estimatedAmount={estimatedAmount} />
       </form>
-      <dl className="text-xs">
-        {toAsset && (
-          <div className="grid grid-cols-2">
-            <dt className="text-surface-1-fg-muted">{t('Available USDT')}</dt>
-            <dd className="text-right">
-              {balances.data?.balanceOf.toString()}
-            </dd>
-          </div>
-        )}
-        <div className="grid grid-cols-2">
-          <dt className="text-surface-1-fg-muted">{t('NEB')}</dt>
-          <dd className="text-right">
-            {estimatedAmount} {APP_SYMBOL}
-          </dd>
-        </div>
-      </dl>
       <FeedbackDialog
         estimatedAmount={estimatedAmount}
         depositData={deposit.data}

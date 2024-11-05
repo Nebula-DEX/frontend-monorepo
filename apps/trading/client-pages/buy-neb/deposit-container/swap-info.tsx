@@ -4,12 +4,14 @@ import BigNumber from 'bignumber.js';
 import { type RouteResponse } from '@0xsquid/sdk/dist/types';
 import { TradingInputError } from '@vegaprotocol/ui-toolkit';
 import { useT } from '../../../lib/use-t';
-import { APP_SYMBOL } from 'apps/trading/lib/constants';
+import { APP_SYMBOL } from '../../../lib/constants';
+import type { AssetERC20 } from '@vegaprotocol/assets';
 
 export const SwapInfo = (props: {
   route?: RouteResponse['route'];
   estimatedAmount: string;
   error: Error | null;
+  bestAsk?: { price: string; volume: string; numberOfOrders: string };
 }) => {
   const t = useT();
   const error = props.error;
@@ -29,7 +31,7 @@ export const SwapInfo = (props: {
   return (
     <dl className="text-xs">
       <div className="grid grid-cols-2">
-        <dt className="text-surface-1-fg-muted">{t('USDT')}</dt>
+        <dt className="text-surface-1-fg-muted">{t('USDT')} (est)</dt>
         <dd className="text-right">
           {addDecimalsFormatNumber(
             estimate.toAmount,
@@ -38,12 +40,24 @@ export const SwapInfo = (props: {
           {estimate.toToken.symbol}
         </dd>
       </div>
-      <div className="grid grid-cols-2 mb-2">
-        <dt className="text-surface-1-fg-muted">{t('NEB')}</dt>
+      <div className="grid grid-cols-2">
+        <dt className="text-surface-1-fg-muted">{t('NEB')} (est)</dt>
         <dd className="text-right">
           {props.estimatedAmount} {APP_SYMBOL}
         </dd>
       </div>
+      {props.bestAsk && (
+        <div className="grid grid-cols-2 mb-2">
+          <dt className="text-surface-1-fg-muted">{t('Best offer')}</dt>
+          <dd className="text-right">
+            {addDecimalsFormatNumber(
+              props.bestAsk.price,
+              estimate.toToken.decimals
+            )}{' '}
+            {estimate.toToken.symbol}
+          </dd>
+        </div>
+      )}
       {Object.entries(gasGroups).map(([key, group]) => {
         const fees = group.map((f) => {
           return toBigNum(f.amount, f.token.decimals);
@@ -85,6 +99,48 @@ export const SwapInfo = (props: {
           }
         </dd>
       </div>
+    </dl>
+  );
+};
+
+export const NonSwapInfo = (props: {
+  estimatedAmount: string;
+  bestAsk?: { price: string; volume: string; numberOfOrders: string };
+  toAsset?: AssetERC20;
+}) => {
+  const t = useT();
+  return (
+    <dl className="text-xs">
+      {props.toAsset && (
+        <div className="grid grid-cols-2">
+          <dt className="text-surface-1-fg-muted">{t('USDT')} (est)</dt>
+          <dd className="text-right">
+            {addDecimalsFormatNumber(
+              props.estimatedAmount,
+              props.toAsset.decimals
+            )}{' '}
+            {props.toAsset.symbol}
+          </dd>
+        </div>
+      )}
+      <div className="grid grid-cols-2">
+        <dt className="text-surface-1-fg-muted">{t('NEB')} (est)</dt>
+        <dd className="text-right">
+          {props.estimatedAmount} {APP_SYMBOL}
+        </dd>
+      </div>
+      {props.bestAsk && props.toAsset && (
+        <div className="grid grid-cols-2 mb-2">
+          <dt className="text-surface-1-fg-muted">{t('Best offer')}</dt>
+          <dd className="text-right">
+            {addDecimalsFormatNumber(
+              props.bestAsk.price,
+              props.toAsset.decimals
+            )}{' '}
+            {props.toAsset.symbol}
+          </dd>
+        </div>
+      )}
     </dl>
   );
 };

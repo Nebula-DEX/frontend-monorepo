@@ -6,7 +6,7 @@ import { Button, Intent, Loader } from '@vegaprotocol/ui-toolkit';
 
 import { useT } from '../../../lib/use-t';
 
-import { SwapInfo } from './swap-info';
+import { NonSwapInfo, SwapInfo } from './swap-info';
 import { type Configs } from './form-schema';
 import * as Fields from './fields';
 import { FeedbackDialog, SquidFeedbackDialog } from './feedback-dialog';
@@ -41,6 +41,8 @@ export const DepositForm = (props: {
     deposit,
     tx,
     estimatedAmount,
+    bestAsk,
+    toAsset,
     onSubmit,
   } = useDepositForm(props);
 
@@ -64,12 +66,21 @@ export const DepositForm = (props: {
           balanceOf={balances.data?.balanceOf}
           nativeBalanceOf={nativeBalance.data}
         />
-        {isSwap && (
+        {isSwap ? (
           <div className="mb-4">
             <SwapInfo
               route={route.data?.route}
               estimatedAmount={estimatedAmount}
               error={route.error}
+              bestAsk={bestAsk}
+            />
+          </div>
+        ) : (
+          <div className="mb-4">
+            <NonSwapInfo
+              estimatedAmount={estimatedAmount}
+              bestAsk={bestAsk}
+              toAsset={toAsset}
             />
           </div>
         )}

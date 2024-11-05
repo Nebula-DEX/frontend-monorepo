@@ -41,7 +41,7 @@ export const useDepositForm = (props: {
     positionDecimalPlaces: number;
   };
 }) => {
-  const lowestAskLvl = props?.asks ? props.asks[0] : undefined;
+  const bestAsk = props?.asks ? props.asks[0] : undefined;
   const tx = useSimpleTransaction();
 
   const { address } = useAccount();
@@ -110,7 +110,7 @@ export const useDepositForm = (props: {
   const squidDeposit = useEvmSquidDeposit();
 
   const executeSpotBuy = (res: TxDeposit | TxSquidDeposit) => {
-    if (!lowestAskLvl) {
+    if (!bestAsk) {
       throw new Error('no asks on swap market book');
     }
 
@@ -120,14 +120,14 @@ export const useDepositForm = (props: {
 
     // amount of deposited arbitrum usdt
     const amount = BigInt(res.data.result.amount);
-    const price = BigInt(lowestAskLvl.price);
+    const price = BigInt(bestAsk.price);
     const size = String(amount / price);
 
     const orderSubmission = {
       marketId: SWAP_MARKET_ID,
       side: Side.SIDE_BUY,
       type: OrderType.TYPE_LIMIT,
-      price: lowestAskLvl.price,
+      price: bestAsk.price,
       timeInForce: OrderTimeInForce.TIME_IN_FORCE_FOK,
       size,
     };
@@ -135,7 +135,7 @@ export const useDepositForm = (props: {
   };
 
   const onSubmit = form.handleSubmit(async (fields) => {
-    if (!lowestAskLvl) {
+    if (!bestAsk) {
       throw new Error('no asks on swap market book');
     }
 
@@ -233,7 +233,7 @@ export const useDepositForm = (props: {
   if (isSwap) {
     // Estimate the final amount after deposit and swap
     const toAmount = BigInt(route.data?.route.estimate.toAmount ?? 0); // USDT
-    const price = BigInt(lowestAskLvl?.price ?? 0); // Price of NEB in USDT
+    const price = BigInt(bestAsk?.price ?? 0); // Price of NEB in USDT
 
     // The estimated amount of NEB that will be received, note fees on spot market are set
     // to 0 so this should be the final amount
@@ -245,7 +245,7 @@ export const useDepositForm = (props: {
     // Estimate the final amount after deposit and swap
     const amount = toAsset ? removeDecimal(fields.amount, toAsset.decimals) : 0;
     const toAmount = BigInt(amount ?? 0); // Amount in USDT
-    const price = BigInt(lowestAskLvl?.price ?? 0); // Price of NEB in USDT
+    const price = BigInt(bestAsk?.price ?? 0); // Price of NEB in USDT
 
     // The estimated amount of NEB that will be received, note fees on spot market are set
     // to 0 so this should be the final amount
@@ -273,5 +273,6 @@ export const useDepositForm = (props: {
     onSubmit,
     tx,
     estimatedAmount,
+    bestAsk,
   };
 };
