@@ -90,7 +90,7 @@ export const OnboardFallbackDepositForm = (props: {
         </Button>
       </form>
 
-      <FeedbackDialog data={deposit.data} onChange={deposit.reset} />
+      <FeedbackDialog depositData={deposit.data} onChange={deposit.reset} />
     </FormProvider>
   );
 };

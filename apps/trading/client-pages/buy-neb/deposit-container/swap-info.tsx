@@ -1,12 +1,14 @@
 import groupBy from 'lodash/groupBy';
-import { toBigNum } from '@vegaprotocol/utils';
+import { addDecimalsFormatNumber, toBigNum } from '@vegaprotocol/utils';
 import BigNumber from 'bignumber.js';
 import { type RouteResponse } from '@0xsquid/sdk/dist/types';
 import { TradingInputError } from '@vegaprotocol/ui-toolkit';
 import { useT } from '../../../lib/use-t';
+import { APP_SYMBOL } from 'apps/trading/lib/constants';
 
 export const SwapInfo = (props: {
   route?: RouteResponse['route'];
+  estimatedAmount: string;
   error: Error | null;
 }) => {
   const t = useT();
@@ -26,6 +28,22 @@ export const SwapInfo = (props: {
 
   return (
     <dl className="text-xs">
+      <div className="grid grid-cols-2">
+        <dt className="text-surface-1-fg-muted">{t('USDT')}</dt>
+        <dd className="text-right">
+          {addDecimalsFormatNumber(
+            estimate.toAmount,
+            estimate.toToken.decimals
+          )}{' '}
+          {estimate.toToken.symbol}
+        </dd>
+      </div>
+      <div className="grid grid-cols-2 mb-2">
+        <dt className="text-surface-1-fg-muted">{t('NEB')}</dt>
+        <dd className="text-right">
+          {props.estimatedAmount} {APP_SYMBOL}
+        </dd>
+      </div>
       {Object.entries(gasGroups).map(([key, group]) => {
         const fees = group.map((f) => {
           return toBigNum(f.amount, f.token.decimals);

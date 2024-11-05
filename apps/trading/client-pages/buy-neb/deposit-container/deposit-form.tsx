@@ -1,10 +1,8 @@
 import { FormProvider } from 'react-hook-form';
 import { type Squid } from '@0xsquid/sdk';
-import { type Estimate } from '@0xsquid/squid-types';
 
 import { type AssetERC20 } from '@vegaprotocol/assets';
 import { Button, Intent, Loader } from '@vegaprotocol/ui-toolkit';
-import { addDecimalsFormatNumber } from '@vegaprotocol/utils';
 
 import { useT } from '../../../lib/use-t';
 
@@ -12,9 +10,9 @@ import { SwapInfo } from './swap-info';
 import { type Configs } from './form-schema';
 import * as Fields from './fields';
 import { FeedbackDialog, SquidFeedbackDialog } from './feedback-dialog';
-import { type TxDeposit, type TxSquidDeposit } from '../../../stores/evm';
 import { useDepositForm } from './use-deposit-form';
 import { useVegaWallet } from '@vegaprotocol/wallet-react';
+import type { RouteResponse } from '@0xsquid/sdk/dist/types';
 
 export const DepositForm = (props: {
   address: string;
@@ -23,8 +21,12 @@ export const DepositForm = (props: {
   assets: Array<AssetERC20>;
   initialAsset?: AssetERC20;
   configs: Configs;
-  onDeposit?: (tx: TxDeposit | TxSquidDeposit) => void;
   minAmount?: string;
+  asks?: Array<{ price: string; volume: string; numberOfOrders: string }>;
+  market: {
+    decimalPlaces: number;
+    positionDecimalPlaces: number;
+  };
 }) => {
   const { pubKeys } = useVegaWallet();
   const {
@@ -37,6 +39,8 @@ export const DepositForm = (props: {
     isSwap,
     squidDeposit,
     deposit,
+    tx,
+    estimatedAmount,
     onSubmit,
   } = useDepositForm(props);
 
@@ -62,21 +66,34 @@ export const DepositForm = (props: {
         />
         {isSwap && (
           <div className="mb-4">
-            <SwapInfo route={route.data?.route} error={route.error} />
+            <SwapInfo
+              route={route.data?.route}
+              estimatedAmount={estimatedAmount}
+              error={route.error}
+            />
           </div>
         )}
         <SubmitButton
           isSwap={isSwap}
           isFetchingRoute={route.isFetching}
-          estimate={route.data?.route.estimate}
+          route={route.data}
+          estimatedAmount={estimatedAmount}
         />
         {!isSwap && (
-          <FeedbackDialog data={deposit.data} onChange={deposit.reset} />
+          <FeedbackDialog
+            depositData={deposit.data}
+            orderTx={tx}
+            onChange={deposit.reset}
+            estimatedAmount={estimatedAmount}
+          />
         )}
         {isSwap && (
           <SquidFeedbackDialog
-            data={squidDeposit.data}
+            depositData={squidDeposit.data}
+            orderTx={tx}
             onChange={squidDeposit.reset}
+            asks={props.asks}
+            estimatedAmount={estimatedAmount}
           />
         )}
       </form>
@@ -85,32 +102,41 @@ export const DepositForm = (props: {
 };
 
 const SubmitButton = (props: {
+  estimatedAmount: string;
+  route: RouteResponse | undefined | null;
   isSwap?: boolean;
   isFetchingRoute?: boolean;
-  isExecuting?: boolean;
-  estimate?: Estimate;
+  isExecutingSwap?: boolean;
+  isExecutingOrder?: boolean;
 }) => {
   const t = useT();
+  const estimate = props.route?.route.estimate;
 
-  let text = t('Deposit');
+  let text = t('Buy NEB');
 
-  if (props.isSwap && props.estimate) {
-    text = t('Deposit {{amount}} {{symbol}}', {
-      amount: addDecimalsFormatNumber(
-        props.estimate.toAmount,
-        props.estimate.toToken.decimals
-      ),
-      symbol: props.estimate.toToken.symbol,
+  if (props.estimatedAmount && props.estimatedAmount !== '0') {
+    text = t('Buy {{amount}} {{symbol}}', {
+      amount: props.estimatedAmount,
+      symbol: 'NEB',
     });
   }
 
   if (props.isFetchingRoute) {
-    text = t('Calculating route');
+    text = t('Calculating swap...');
   }
 
-  if (props.isExecuting) {
-    text = t('Depositing...');
+  if (props.isExecutingSwap && estimate) {
+    text = t('Swapping {{from}} to {{to}}', {
+      from: estimate.fromToken.symbol,
+      to: estimate.toToken.symbol,
+    });
   }
+
+  if (props.isExecutingOrder) {
+    text = t('Buying NEB...');
+  }
+
+  const isExecuting = props.isExecutingSwap || props.isExecutingOrder;
 
   return (
     <Button
@@ -118,11 +144,13 @@ const SubmitButton = (props: {
       size="lg"
       fill={true}
       intent={Intent.Secondary}
-      disabled={props.isFetchingRoute || props.isExecuting}
+      disabled={
+        props.isFetchingRoute || props.isExecutingSwap || props.isExecutingOrder
+      }
       className="flex gap-2 items-center"
     >
       {text}
-      {props.isExecuting && <Loader size="small" />}
+      {isExecuting && <Loader size="small" />}
     </Button>
   );
 };

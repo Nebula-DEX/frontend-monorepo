@@ -15,25 +15,40 @@ import {
   DefaultBadge,
   PendingBadge,
 } from '../../../components/transaction-dialog/transaction-badge';
-import { DEFAULT_DISPLAY_DPS } from '../../../lib/constants';
+import { APP_SYMBOL, DEFAULT_DISPLAY_DPS } from '../../../lib/constants';
+import type { useSimpleTransaction } from '@vegaprotocol/wallet-react';
 
 type FeedbackDialogProps = {
-  data?: TxDeposit;
+  estimatedAmount: string;
+  depositData?: TxDeposit;
+  orderTx?: ReturnType<typeof useSimpleTransaction>;
   onChange: (open: boolean) => void;
 };
 
 export const FeedbackDialog = (props: FeedbackDialogProps) => {
   const t = useT();
-  const txActive = Boolean(props.data && props.data.status !== 'idle');
+  const txActive = Boolean(
+    props.depositData && props.depositData.status !== 'idle'
+  );
   return (
     <Dialog open={txActive} onChange={props.onChange}>
       <DialogTitle className="sr-only">{t('Deposit')}</DialogTitle>
-      {props.data && <Content tx={props.data} />}
+      {props.depositData && (
+        <Content
+          tx={props.depositData}
+          orderTx={props.orderTx}
+          estimatedAmount={props.estimatedAmount}
+        />
+      )}
     </Dialog>
   );
 };
 
-const Content = (props: { tx: TxDeposit }) => {
+const Content = (props: {
+  tx: TxDeposit;
+  estimatedAmount: string;
+  orderTx: FeedbackDialogProps['orderTx'];
+}) => {
   const t = useT();
   const data = props.tx.data;
 
@@ -43,7 +58,7 @@ const Content = (props: { tx: TxDeposit }) => {
     <div className="flex flex-col items-start gap-4">
       <div>
         <p className="text-surface-1-fg-muted">
-          {t('Deposit')} <br />
+          {t('Send')} <br />
           {data && data.asset && (
             <span className="text-surface-1-fg text-2xl">
               {addDecimalsFormatNumber(
@@ -54,6 +69,13 @@ const Content = (props: { tx: TxDeposit }) => {
               {data.asset.symbol}
             </span>
           )}
+        </p>
+        <p className="text-surface-1-fg-muted">
+          {t('Receive')} <br />
+          <span className="text-surface-1-fg text-2xl">
+            {props.estimatedAmount}
+            {` ${APP_SYMBOL}`}
+          </span>
         </p>
       </div>
       <hr className="w-full" />
@@ -101,6 +123,25 @@ const Content = (props: { tx: TxDeposit }) => {
           >
             <p>{t('Confirm deposit')}</p>
           </FeedbackStep>
+          <FeedbackStep
+            pending={
+              props.orderTx?.status === 'Requested' ||
+              props.orderTx?.status === 'Pending'
+            }
+            complete={props.orderTx?.status === 'Confirmed'}
+          >
+            <p>{t('Approve spot order')}</p>
+            {props.orderTx?.status === 'Requested' && (
+              <p className="text-surface-0-fg-muted">
+                {t('Confirm in wallet')}
+              </p>
+            )}
+            {props.orderTx?.status === 'Confirmed' && (
+              <p className="text-surface-0-fg-muted">
+                {t('Spot order confirmed')}
+              </p>
+            )}
+          </FeedbackStep>
         </div>
       ) : (
         <div className="flex flex-col gap-1">
@@ -121,22 +162,39 @@ const Content = (props: { tx: TxDeposit }) => {
 };
 
 type SquidFeedbackDialogProps = {
-  data?: TxSquidDeposit;
+  depositData?: TxSquidDeposit;
+  orderTx?: ReturnType<typeof useSimpleTransaction>;
+  asks?: Array<{ price: string; volume: string; numberOfOrders: string }>;
   onChange: (open: boolean) => void;
+  estimatedAmount: string;
 };
 
 export const SquidFeedbackDialog = (props: SquidFeedbackDialogProps) => {
   const t = useT();
-  const txActive = Boolean(props.data && props.data.status !== 'idle');
+  const txActive = Boolean(
+    props.depositData && props.depositData.status !== 'idle'
+  );
   return (
     <Dialog open={txActive} onChange={props.onChange}>
       <DialogTitle className="sr-only">{t('Swap and Deposit')}</DialogTitle>
-      {props.data && <SquidContent tx={props.data} />}
+      {props.depositData && (
+        <SquidContent
+          tx={props.depositData}
+          orderTx={props.orderTx}
+          asks={props.asks}
+          estimatedAmount={props.estimatedAmount}
+        />
+      )}
     </Dialog>
   );
 };
 
-const SquidContent = (props: { tx: TxSquidDeposit }) => {
+const SquidContent = (props: {
+  tx: TxSquidDeposit;
+  orderTx?: ReturnType<typeof useSimpleTransaction>;
+  asks?: Array<{ price: string; volume: string; numberOfOrders: string }>;
+  estimatedAmount: string;
+}) => {
   const t = useT();
   const data = props.tx.data;
 
@@ -147,7 +205,7 @@ const SquidContent = (props: { tx: TxSquidDeposit }) => {
     <div className="flex flex-col items-start gap-4">
       <div>
         <p className="text-surface-1-fg-muted">
-          {t('Deposit')} <br />
+          {t('Send')} <br />
           {estimate && (
             <span className="text-surface-1-fg text-2xl">
               {addDecimalsFormatNumber(
@@ -160,15 +218,10 @@ const SquidContent = (props: { tx: TxSquidDeposit }) => {
         </p>
         <p className="text-surface-1-fg-muted">
           {t('Receive')} <br />
-          {estimate && (
-            <span className="text-surface-1-fg text-2xl">
-              {addDecimalsFormatNumber(
-                estimate.toAmount,
-                estimate.toToken.decimals
-              )}{' '}
-              {estimate.toToken.symbol}
-            </span>
-          )}
+          <span className="text-surface-1-fg text-2xl">
+            {props.estimatedAmount}
+            {` ${APP_SYMBOL}`}
+          </span>
         </p>
       </div>
       <hr className="w-full" />
@@ -192,8 +245,8 @@ const SquidContent = (props: { tx: TxSquidDeposit }) => {
             )}
           </FeedbackStep>
           <FeedbackStep
-            pending={Boolean(data.hash && !data.receipt)}
-            complete={Boolean(data.receipt)}
+            pending={Boolean(data.hash && !data.result)}
+            complete={Boolean(data.result)}
           >
             <p>{t('Confirm deposit')}</p>
             {props.tx.status === 'finalized' && data.receipt && (
@@ -201,6 +254,25 @@ const SquidContent = (props: { tx: TxSquidDeposit }) => {
                 {t(
                   'Your tokens have been swapped and deposited to the network. It may take a few minutes for your funds to appear under your public key.'
                 )}
+              </p>
+            )}
+          </FeedbackStep>
+          <FeedbackStep
+            pending={
+              props.orderTx?.status === 'Requested' ||
+              props.orderTx?.status === 'Pending'
+            }
+            complete={props.orderTx?.status === 'Confirmed'}
+          >
+            <p>{t('Approve spot order')}</p>
+            {props.orderTx?.status === 'Requested' && (
+              <p className="text-surface-0-fg-muted">
+                {t('Confirm in wallet')}
+              </p>
+            )}
+            {props.orderTx?.status === 'Confirmed' && (
+              <p className="text-surface-0-fg-muted">
+                {t('Spot order confirmed')}
               </p>
             )}
           </FeedbackStep>

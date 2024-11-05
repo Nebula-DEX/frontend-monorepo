@@ -99,11 +99,11 @@ export const OnboardDepositForm = (props: {
           estimate={route.data?.route.estimate}
         />
         {!isSwap && (
-          <FeedbackDialog data={deposit.data} onChange={deposit.reset} />
+          <FeedbackDialog depositData={deposit.data} onChange={deposit.reset} />
         )}
         {isSwap && (
           <SquidFeedbackDialog
-            data={squidDeposit.data}
+            depositData={squidDeposit.data}
             onChange={squidDeposit.reset}
           />
         )}

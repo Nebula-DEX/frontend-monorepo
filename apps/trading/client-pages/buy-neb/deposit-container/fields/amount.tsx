@@ -13,6 +13,7 @@ export function Amount(props: {
   control: Control<FormFields>;
   balanceOf: BigNumber | undefined;
   nativeBalanceOf: BigNumber | undefined;
+  symbol?: string;
 }) {
   const t = useT();
   const form = useFormContext<FormFields>();
@@ -24,7 +25,14 @@ export function Amount(props: {
       name="amount"
       render={({ field, fieldState }) => {
         return (
-          <FormGroup label="Amount" labelFor="amount">
+          <FormGroup
+            label={
+              props.symbol
+                ? t('Amount ({{symbol}})', { symbol: props.symbol })
+                : t('Amount')
+            }
+            labelFor="amount"
+          >
             <Input {...field} />
             {fieldState.error && (
               <TradingInputError>{fieldState.error.message}</TradingInputError>
