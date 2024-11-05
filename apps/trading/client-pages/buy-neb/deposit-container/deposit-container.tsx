@@ -11,6 +11,7 @@ import { useMarket } from '@vegaprotocol/rest';
 
 export const SWAP_MARKET_ID =
   '13af1d3e06d639f2973ec108d0d4ce0aa8fe77a4f5c29891aec3abe329fb1fa0';
+export const MAX_BUY_USDT = 100_000;
 
 /**
  * Gets env vars, assets, and configs required for the deposit form
@@ -47,7 +48,7 @@ export const DepositContainer = (props: {
   }
 
   if (!lowestAskLvl) {
-    return <p>NEB is not currently available to buy</p>;
+    return <p>{t('NEB is not currently available to buy')}</p>;
   }
 
   // If we have squid initialized show the form which allows swaps

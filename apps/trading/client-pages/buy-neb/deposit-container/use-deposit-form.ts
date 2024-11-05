@@ -13,11 +13,12 @@ import { useEvmDeposit } from '../../../lib/hooks/use-evm-deposit';
 import { useEvmSquidDeposit } from 'apps/trading/lib/hooks/use-evm-squid-deposit';
 import { type TxDeposit, type TxSquidDeposit } from '../../../stores/evm';
 import BigNumber from 'bignumber.js';
-import { SWAP_MARKET_ID } from './deposit-container';
+import { MAX_BUY_USDT, SWAP_MARKET_ID } from './deposit-container';
 import { OrderTimeInForce, OrderType, Side } from '@vegaprotocol/types';
 import { useSimpleTransaction } from '@vegaprotocol/wallet-react';
 import { removeDecimal, toBigNum } from '@vegaprotocol/utils';
 import { localLoggerFactory } from '@vegaprotocol/logger';
+import { useT } from '../../../lib/use-t';
 
 const logger = localLoggerFactory({
   application: 'buy-neb',
@@ -41,6 +42,7 @@ export const useDepositForm = (props: {
     positionDecimalPlaces: number;
   };
 }) => {
+  const t = useT();
   const bestAsk = props?.asks ? props.asks[0] : undefined;
   const tx = useSimpleTransaction();
 
@@ -163,6 +165,13 @@ export const useDepositForm = (props: {
         throw new Error('no route data');
       }
 
+      if (Number(route.data.route.estimate.toAmount) > MAX_BUY_USDT) {
+        form.setError('amount', {
+          message: t('Maximum of 100k USD permitted'),
+        });
+        return;
+      }
+
       const quantumizedAmount = BigNumber(
         route.data.route.estimate.toAmount
       ).div(toAsset.quantum);
@@ -203,6 +212,13 @@ export const useDepositForm = (props: {
 
       if (!config) {
         throw new Error(`no bridge for toAsset ${toAsset.id}`);
+      }
+
+      if (Number(fields.amount) > MAX_BUY_USDT) {
+        form.setError('amount', {
+          message: t('Maximum of 100k USD permitted'),
+        });
+        return;
       }
 
       const res = await deposit.write({

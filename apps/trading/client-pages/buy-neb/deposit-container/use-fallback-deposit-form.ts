@@ -19,7 +19,7 @@ import {
 import BigNumber from 'bignumber.js';
 import { type TxDeposit } from '../../../stores/evm';
 import { localLoggerFactory } from '@vegaprotocol/logger';
-import { SWAP_MARKET_ID } from './deposit-container';
+import { MAX_BUY_USDT, SWAP_MARKET_ID } from './deposit-container';
 import { OrderTimeInForce, OrderType, Side } from '@vegaprotocol/types';
 import { removeDecimal, toBigNum } from '@vegaprotocol/utils';
 
@@ -119,6 +119,13 @@ export const useFallbackDepositForm = (props: {
     // The default bridgeAddress for the selected toAsset if an arbitrum
     // to asset is selected will get changed to the squid receiver address
     const bridgeAddress = config.collateral_bridge_contract.address;
+
+    if (Number(fields.amount) > MAX_BUY_USDT) {
+      form.setError('amount', {
+        message: 'Maximum of 100k permitted',
+      });
+      return;
+    }
 
     const res = await deposit.write({
       asset: toAsset,
