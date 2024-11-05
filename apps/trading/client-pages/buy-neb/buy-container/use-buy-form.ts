@@ -5,15 +5,15 @@ import { type Squid } from '@0xsquid/sdk';
 
 import { type AssetERC20 } from '@vegaprotocol/assets';
 
-import { useAssetReadContracts } from './use-asset-read-contracts';
+import { useAssetReadContracts } from '../../../lib/hooks/use-asset-read-contracts';
 import { useSquidRoute } from './use-squid-route';
 import { type FormFields, type Configs, formSchema } from './form-schema';
-import { useNativeBalance } from './use-native-balance';
+import { useNativeBalance } from '../../../lib/hooks/use-native-balance';
 import { useEvmDeposit } from '../../../lib/hooks/use-evm-deposit';
 import { useEvmSquidDeposit } from 'apps/trading/lib/hooks/use-evm-squid-deposit';
 import { type TxDeposit, type TxSquidDeposit } from '../../../stores/evm';
 import BigNumber from 'bignumber.js';
-import { MAX_BUY_USDT, SWAP_MARKET_ID } from './deposit-container';
+import { MAX_BUY_USDT, SWAP_MARKET_ID } from './buy-container';
 import { OrderTimeInForce, OrderType, Side } from '@vegaprotocol/types';
 import { useSimpleTransaction } from '@vegaprotocol/wallet-react';
 import { removeDecimal, toBigNum } from '@vegaprotocol/utils';
@@ -28,7 +28,7 @@ const logger = localLoggerFactory({
 /**
  * Form logic for deposits
  */
-export const useDepositForm = (props: {
+export const useBuyForm = (props: {
   address: string;
   pubKey: string;
   squid: Squid;

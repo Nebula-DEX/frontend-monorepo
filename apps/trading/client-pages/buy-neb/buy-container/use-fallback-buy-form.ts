@@ -9,7 +9,7 @@ import {
 } from '@vegaprotocol/wallet-react';
 
 import { useEvmDeposit } from '../../../lib/hooks/use-evm-deposit';
-import { useAssetReadContracts } from './use-asset-read-contracts';
+import { useAssetReadContracts } from '../../../lib/hooks/use-asset-read-contracts';
 
 import {
   type FormFields,
@@ -19,13 +19,13 @@ import {
 import BigNumber from 'bignumber.js';
 import { type TxDeposit } from '../../../stores/evm';
 import { localLoggerFactory } from '@vegaprotocol/logger';
-import { MAX_BUY_USDT, SWAP_MARKET_ID } from './deposit-container';
+import { MAX_BUY_USDT, SWAP_MARKET_ID } from './buy-container';
 import { OrderTimeInForce, OrderType, Side } from '@vegaprotocol/types';
 import { removeDecimal, toBigNum } from '@vegaprotocol/utils';
 
 const logger = localLoggerFactory({ application: 'buy-neb-fallback' });
 
-export const useFallbackDepositForm = (props: {
+export const useFallbackBuyForm = (props: {
   assets: Array<AssetERC20>;
   initialAsset?: AssetERC20;
   configs: Configs;

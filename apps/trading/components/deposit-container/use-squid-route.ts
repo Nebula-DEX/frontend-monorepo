@@ -6,7 +6,7 @@ import { SQUID_RECEIVER_ABI, prepend0x } from '@vegaprotocol/smart-contracts';
 import { removeDecimal } from '@vegaprotocol/utils';
 import { type AssetERC20 } from '@vegaprotocol/assets';
 import { useQuery } from '@tanstack/react-query';
-import { useSquid } from './use-squid';
+import { useSquid } from '../../lib/hooks/use-squid';
 import { type FormFields, formSchema } from './form-schema';
 import { encodeFunctionData } from 'viem';
 import { getErc20Abi } from '../../lib/utils/get-erc20-abi';

@@ -6,7 +6,7 @@ import { type AssetERC20 } from '@vegaprotocol/assets';
 import { useVegaWallet } from '@vegaprotocol/wallet-react';
 
 import { useEvmDeposit } from '../../lib/hooks/use-evm-deposit';
-import { useAssetReadContracts } from './use-asset-read-contracts';
+import { useAssetReadContracts } from '../../lib/hooks/use-asset-read-contracts';
 
 // TODO: change this to show lifetime depositl limit only
 // import { Approval } from './approval';

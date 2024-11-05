@@ -1,9 +1,9 @@
 import { useEVMBridgeConfigs, useEthereumConfig } from '@vegaprotocol/web3';
 
-import { DepositForm } from './deposit-form';
+import { BuyForm } from './buy-form';
 import { type AssetERC20, useEnabledAssets } from '@vegaprotocol/assets';
-import { useSquid } from './use-squid';
-import { FallbackDepositForm } from './fallback-deposit-form';
+import { useSquid } from '../../../lib/hooks/use-squid';
+import { FallbackBuyForm } from './fallback-buy-form';
 import { useT } from '../../../lib/use-t';
 import { Networks, useEnvironment } from '@vegaprotocol/environment';
 import { useOrderbook } from '@vegaprotocol/market-depth';
@@ -16,7 +16,7 @@ export const MAX_BUY_USDT = 100_000;
 /**
  * Gets env vars, assets, and configs required for the deposit form
  */
-export const DepositContainer = (props: {
+export const BuyContainer = (props: {
   address: string;
   pubKey: string;
   initialAssetId?: string;
@@ -59,7 +59,7 @@ export const DepositContainer = (props: {
     squid.initialized
   ) {
     return (
-      <DepositForm
+      <BuyForm
         address={props.address}
         pubKey={props.pubKey}
         squid={squid}
@@ -77,7 +77,7 @@ export const DepositContainer = (props: {
   // use a form which doesn't require squid, but also doesn't allow swaps,
   // which is better than noting
   return (
-    <FallbackDepositForm
+    <FallbackBuyForm
       assets={assets as AssetERC20[]}
       initialAsset={asset as AssetERC20}
       configs={allConfigs}

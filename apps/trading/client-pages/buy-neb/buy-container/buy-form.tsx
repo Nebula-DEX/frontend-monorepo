@@ -10,11 +10,11 @@ import { NonSwapInfo, SwapInfo } from './swap-info';
 import { type Configs } from './form-schema';
 import * as Fields from './fields';
 import { FeedbackDialog, SquidFeedbackDialog } from './feedback-dialog';
-import { useDepositForm } from './use-deposit-form';
+import { useBuyForm } from './use-buy-form';
 import { useVegaWallet } from '@vegaprotocol/wallet-react';
 import type { RouteResponse } from '@0xsquid/sdk/dist/types';
 
-export const DepositForm = (props: {
+export const BuyForm = (props: {
   address: string;
   pubKey: string;
   squid: Squid;
@@ -44,7 +44,7 @@ export const DepositForm = (props: {
     bestAsk,
     toAsset,
     onSubmit,
-  } = useDepositForm(props);
+  } = useBuyForm(props);
 
   return (
     <FormProvider {...form}>

@@ -10,12 +10,12 @@ import * as Fields from './fields';
 
 import { type Configs } from './form-schema';
 import { FeedbackDialog } from './feedback-dialog';
-import { useFallbackDepositForm } from './use-fallback-deposit-form';
+import { useFallbackBuyForm } from './use-fallback-buy-form';
 import { getChainName } from '@vegaprotocol/web3';
 import { APP_SYMBOL } from 'apps/trading/lib/constants';
 import { NonSwapInfo } from './swap-info';
 
-export const FallbackDepositForm = (props: {
+export const FallbackBuyForm = (props: {
   assets: Array<AssetERC20>;
   initialAsset?: AssetERC20;
   configs: Configs;
@@ -36,7 +36,7 @@ export const FallbackDepositForm = (props: {
     toAsset,
     bestAsk,
     onSubmit,
-  } = useFallbackDepositForm(props);
+  } = useFallbackBuyForm(props);
 
   let symbol = undefined;
   if (props.initialAsset) {

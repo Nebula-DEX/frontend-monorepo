@@ -1,5 +1,5 @@
-import { HeaderPage } from 'apps/trading/components/header-page';
-import { DepositContainer } from './deposit-container';
+import { HeaderPage } from '../../components/header-page';
+import { BuyContainer } from './buy-container';
 import { useDialogStore, useVegaWallet } from '@vegaprotocol/wallet-react';
 import { Button, Intent } from '@vegaprotocol/ui-toolkit';
 import { USDT_ID } from '../../lib/constants';
@@ -14,7 +14,7 @@ export const BuyNeb = () => {
     <section className="flex flex-col gap-10 min-w-[500px] max-w-3xl mx-auto">
       <HeaderPage>Buy NEB</HeaderPage>
       {pubKey && address ? (
-        <DepositContainer
+        <BuyContainer
           address={address}
           pubKey={pubKey}
           initialAssetId={USDT_ID}

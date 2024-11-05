@@ -6,10 +6,10 @@ import { type Squid } from '@0xsquid/sdk';
 import { type AssetERC20 } from '@vegaprotocol/assets';
 import { useVegaWallet } from '@vegaprotocol/wallet-react';
 
-import { useAssetReadContracts } from './use-asset-read-contracts';
+import { useAssetReadContracts } from '../../lib/hooks/use-asset-read-contracts';
 import { useSquidRoute } from './use-squid-route';
 import { type FormFields, type Configs, formSchema } from './form-schema';
-import { useNativeBalance } from './use-native-balance';
+import { useNativeBalance } from '../../lib/hooks/use-native-balance';
 import { useEvmDeposit } from '../../lib/hooks/use-evm-deposit';
 import { useEvmSquidDeposit } from 'apps/trading/lib/hooks/use-evm-squid-deposit';
 import { type TxDeposit, type TxSquidDeposit } from '../../stores/evm';

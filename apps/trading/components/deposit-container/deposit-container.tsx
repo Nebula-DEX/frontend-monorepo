@@ -2,7 +2,7 @@ import { useEVMBridgeConfigs, useEthereumConfig } from '@vegaprotocol/web3';
 
 import { DepositForm } from './deposit-form';
 import { type AssetERC20, useEnabledAssets } from '@vegaprotocol/assets';
-import { useSquid } from './use-squid';
+import { useSquid } from '../../lib/hooks/use-squid';
 import { FallbackDepositForm } from './fallback-deposit-form';
 import { useT } from '../../lib/use-t';
 import { Networks, useEnvironment } from '@vegaprotocol/environment';
