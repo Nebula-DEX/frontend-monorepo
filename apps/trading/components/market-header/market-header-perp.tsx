@@ -42,7 +42,7 @@ export const MarketHeaderPerp = ({ market }: MarketHeaderPerpProps) => {
       <Stats.FundingRateStat marketId={market.id} />
       <Stats.IndexPriceStat
         marketId={market.id}
-        assetDecimals={asset.decimals}
+        decimalPlaces={market.decimalPlaces}
         markPriceConfiguration={market.markPriceConfiguration}
       />
     </>

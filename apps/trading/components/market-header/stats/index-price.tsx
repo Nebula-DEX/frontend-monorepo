@@ -11,11 +11,11 @@ import { useT } from '../../../lib/use-t';
 
 export const IndexPriceStat = ({
   marketId,
-  assetDecimals,
+  decimalPlaces,
   markPriceConfiguration,
 }: {
   marketId: string;
-  assetDecimals: number;
+  decimalPlaces: number;
   markPriceConfiguration: MarketFieldsFragment['markPriceConfiguration'];
 }) => {
   const { VEGA_EXPLORER_URL } = useEnvironment();
@@ -57,7 +57,7 @@ export const IndexPriceStat = ({
       }
       data-testid="index-price"
     >
-      <IndexPrice marketId={marketId} decimalPlaces={assetDecimals} />
+      <IndexPrice marketId={marketId} decimalPlaces={decimalPlaces} />
     </HeaderStat>
   );
 };
