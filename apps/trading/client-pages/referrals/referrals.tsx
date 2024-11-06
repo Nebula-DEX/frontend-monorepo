@@ -16,6 +16,7 @@ import { ErrorBoundary } from '../../components/error-boundary';
 import { usePageTitle } from '../../lib/hooks/use-page-title';
 import { useFindReferralSet } from './hooks/use-find-referral-set';
 import { HeaderHero } from '../../components/header-hero';
+import { APP_NAME } from '../../lib/constants';
 
 const Nav = () => {
   const t = useT();
@@ -42,7 +43,11 @@ export const Referrals = () => {
 
   return (
     <ErrorBoundary feature="referrals">
-      <HeaderHero title={t('Vega community referrals')}>
+      <HeaderHero
+        title={t('{{appName}} community referrals', {
+          appName: APP_NAME,
+        })}
+      >
         <p>
           {t(
             'Referral programs can be proposed and created via community governance.'

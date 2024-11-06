@@ -3,6 +3,7 @@
   "(Created at: {{createdAt}})": "(Created at: {{createdAt}})",
   "(Tier {{tier}} as of last epoch)": "(Tier {{tier}} as of last epoch)",
   "[empty]": "[empty]",
+  "{{appName}} community referrals": "{{appName}} community referrals",
   "{{amount}} {{assetSymbol}} is currently required": "{{amount}} {{assetSymbol}} is currently required",
   "{{amount}} $VEGA staked": "{{amount}} $NEB staked",
   "{{amount}}x fees paid": "{{amount}}x fees paid",
