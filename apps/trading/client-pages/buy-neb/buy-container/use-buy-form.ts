@@ -44,6 +44,7 @@ export const useBuyForm = (props: {
 }) => {
   const t = useT();
   const bestAsk = props?.asks ? props.asks[0] : undefined;
+  const nextBestAsk = props?.asks ? props.asks[1] : undefined;
   const tx = useSimpleTransaction();
 
   const { address } = useAccount();
@@ -299,5 +300,6 @@ export const useBuyForm = (props: {
     tx,
     estimatedAmount,
     bestAsk,
+    nextBestAsk,
   };
 };

@@ -37,6 +37,7 @@ export const useFallbackBuyForm = (props: {
   };
 }) => {
   const bestAsk = props?.asks ? props.asks[0] : undefined;
+  const nextBestAsk = props?.asks ? props.asks[1] : undefined;
   const tx = useSimpleTransaction();
   const { pubKey } = useVegaWallet();
 
@@ -173,5 +174,6 @@ export const useFallbackBuyForm = (props: {
     tx,
     estimatedAmount,
     bestAsk,
+    nextBestAsk,
   };
 };

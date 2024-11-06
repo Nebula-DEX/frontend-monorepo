@@ -12,6 +12,8 @@ export const SwapInfo = (props: {
   estimatedAmount: string;
   error: Error | null;
   bestAsk?: { price: string; volume: string; numberOfOrders: string };
+  nextBestAsk?: { price: string; volume: string; numberOfOrders: string };
+  market: { decimalPlaces: number; positionDecimalPlaces: number };
 }) => {
   const t = useT();
   const error = props.error;
@@ -47,11 +49,31 @@ export const SwapInfo = (props: {
         </dd>
       </div>
       {props.bestAsk && (
-        <div className="grid grid-cols-2 mb-2">
+        <div className="grid grid-cols-2">
           <dt className="text-surface-1-fg-muted">{t('Best offer')}</dt>
           <dd className="text-right">
+            {`${addDecimalsFormatNumber(
+              props.bestAsk.volume,
+              props.market.positionDecimalPlaces
+            )} @ `}
             {addDecimalsFormatNumber(
               props.bestAsk.price,
+              estimate.toToken.decimals
+            )}{' '}
+            {estimate.toToken.symbol}
+          </dd>
+        </div>
+      )}
+      {props.nextBestAsk && (
+        <div className="grid grid-cols-2">
+          <dt className="text-surface-1-fg-muted">{t('Next best offer')}</dt>
+          <dd className="text-right">
+            {`${addDecimalsFormatNumber(
+              props.nextBestAsk.volume,
+              props.market.positionDecimalPlaces
+            )} @ `}
+            {addDecimalsFormatNumber(
+              props.nextBestAsk.price,
               estimate.toToken.decimals
             )}{' '}
             {estimate.toToken.symbol}
@@ -64,7 +86,7 @@ export const SwapInfo = (props: {
         });
         const total = BigNumber.sum.apply(null, fees);
         return (
-          <div key={key} className="grid grid-cols-2">
+          <div key={key} className="grid grid-cols-2 mt-2">
             <dt className="text-surface-1-fg-muted">{t('Gas costs')}</dt>
             <dd className="text-right">
               {total.toString()} {group[0].token.symbol}
@@ -86,19 +108,6 @@ export const SwapInfo = (props: {
           </div>
         );
       })}
-      <div className="grid grid-cols-2">
-        <dt className="text-surface-1-fg-muted">{t('Price impact')}</dt>
-        <dd className="text-right">{estimate.aggregatePriceImpact}%</dd>
-      </div>
-      <div className="grid grid-cols-2">
-        <dt className="text-surface-1-fg-muted">{t('Slippage')}</dt>
-        <dd className="text-right">
-          {
-            // @ts-ignore aggregateSlippage is not in the type definition
-            estimate.aggregateSlippage
-          }
-        </dd>
-      </div>
     </dl>
   );
 };
@@ -106,7 +115,9 @@ export const SwapInfo = (props: {
 export const NonSwapInfo = (props: {
   estimatedAmount: string;
   bestAsk?: { price: string; volume: string; numberOfOrders: string };
+  nextBestAsk?: { price: string; volume: string; numberOfOrders: string };
   toAsset?: AssetERC20;
+  market: { decimalPlaces: number; positionDecimalPlaces: number };
 }) => {
   const t = useT();
   return (
@@ -129,17 +140,43 @@ export const NonSwapInfo = (props: {
           {props.estimatedAmount} {APP_SYMBOL}
         </dd>
       </div>
-      {props.bestAsk && props.toAsset && (
-        <div className="grid grid-cols-2 mb-2">
-          <dt className="text-surface-1-fg-muted">{t('Best offer')}</dt>
-          <dd className="text-right">
-            {addDecimalsFormatNumber(
-              props.bestAsk.price,
-              props.toAsset.decimals
-            )}{' '}
-            {props.toAsset.symbol}
-          </dd>
-        </div>
+      {props.toAsset && (
+        <>
+          {props.bestAsk && (
+            <div className="grid grid-cols-2">
+              <dt className="text-surface-1-fg-muted">{t('Best offer')}</dt>
+              <dd className="text-right">
+                {`${addDecimalsFormatNumber(
+                  props.bestAsk.volume,
+                  props.market.positionDecimalPlaces
+                )} @ `}
+                {addDecimalsFormatNumber(
+                  props.bestAsk.price,
+                  props.toAsset.decimals
+                )}{' '}
+                {props.toAsset.symbol}
+              </dd>
+            </div>
+          )}
+          {props.nextBestAsk && (
+            <div className="grid grid-cols-2">
+              <dt className="text-surface-1-fg-muted">
+                {t('Next best offer')}
+              </dt>
+              <dd className="text-right">
+                {`${addDecimalsFormatNumber(
+                  props.nextBestAsk.volume,
+                  props.market.positionDecimalPlaces
+                )} @ `}
+                {addDecimalsFormatNumber(
+                  props.nextBestAsk.price,
+                  props.toAsset.decimals
+                )}{' '}
+                {props.toAsset.symbol}
+              </dd>
+            </div>
+          )}
+        </>
       )}
     </dl>
   );

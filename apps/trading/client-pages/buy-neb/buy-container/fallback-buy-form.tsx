@@ -35,6 +35,7 @@ export const FallbackBuyForm = (props: {
     estimatedAmount,
     toAsset,
     bestAsk,
+    nextBestAsk,
     onSubmit,
   } = useFallbackBuyForm(props);
 
@@ -59,7 +60,9 @@ export const FallbackBuyForm = (props: {
           <NonSwapInfo
             estimatedAmount={estimatedAmount}
             bestAsk={bestAsk}
+            nextBestAsk={nextBestAsk}
             toAsset={toAsset}
+            market={props.market}
           />
         </div>
         <SubmitButton estimatedAmount={estimatedAmount} />

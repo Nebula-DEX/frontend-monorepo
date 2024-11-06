@@ -42,6 +42,7 @@ export const BuyForm = (props: {
     tx,
     estimatedAmount,
     bestAsk,
+    nextBestAsk,
     toAsset,
     onSubmit,
   } = useBuyForm(props);
@@ -73,6 +74,8 @@ export const BuyForm = (props: {
               estimatedAmount={estimatedAmount}
               error={route.error}
               bestAsk={bestAsk}
+              nextBestAsk={nextBestAsk}
+              market={props.market}
             />
           </div>
         ) : (
@@ -80,7 +83,9 @@ export const BuyForm = (props: {
             <NonSwapInfo
               estimatedAmount={estimatedAmount}
               bestAsk={bestAsk}
+              nextBestAsk={nextBestAsk}
               toAsset={toAsset}
+              market={props.market}
             />
           </div>
         )}
