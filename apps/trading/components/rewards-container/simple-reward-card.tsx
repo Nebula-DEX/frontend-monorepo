@@ -22,7 +22,7 @@ export const SimpleRewardCard = ({
 }: RewardCard) => {
   const t = useT();
   return (
-    <div className="grid grid-rows-[subgrid] row-span-5 p-4 rounded-grid relative overflow-hidden">
+    <div className="grid grid-rows-[subgrid] row-span-5 p-4 rounded-grid relative overflow-hidden bg-gradient-to-b from-surface-1/80 to-surface-1/60">
       <ColourfulBorder />
       <RewardImage img={img} />
 
@@ -45,7 +45,7 @@ export const SimpleRewardCard = ({
 
       <h3 className="text-3xl leading-none">{title}</h3>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 text-surface-1-fg-muted">
         <ReactMarkdown
           components={{
             p: ({ children }) => {
@@ -53,7 +53,7 @@ export const SimpleRewardCard = ({
             },
             ul: ({ children }) => {
               return (
-                <ul className="flex flex-col gap-0 list-disc list-inside marker:text-intent-primary marker:mr-0">
+                <ul className="flex flex-col gap-0 list-disc list-inside marker:text-highlight marker:mr-0">
                   {children}
                 </ul>
               );

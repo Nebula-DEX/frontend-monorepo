@@ -1,5 +1,4 @@
 import { queryOptions } from '@tanstack/react-query';
-import axios from 'axios';
 import { z } from 'zod';
 import { Time } from '../utils';
 
@@ -19,13 +18,9 @@ const rewardCardSchema = z.object({
 const rewardCardsSchema = z.array(rewardCardSchema);
 
 export type RewardCard = z.infer<typeof rewardCardSchema>;
-type RewardCardsResponse = z.infer<typeof rewardCardsSchema>;
 
 export const retrieveRewardCards = async () => {
-  const endpoint = '/reward-cards.json';
-  const res = await axios.get<RewardCardsResponse>(endpoint);
-
-  return rewardCardsSchema.parse(res.data);
+  return rewardCardsSchema.parse(data);
 };
 
 export const queryKeys = {
@@ -38,5 +33,43 @@ export function rewardCardsOptions() {
     queryKey: queryKeys.all,
     queryFn: () => retrieveRewardCards(),
     staleTime: Time.HOUR,
+    initialData: data,
   });
 }
+
+// Add reward card data here
+const data: RewardCard[] = [
+  /*
+  {
+    rewardId:
+      '82456b68780b36dcdfcda3fb70dbfd81dc1a81f20175ff5d9de13e56f8478b51',
+    title: 'Reward A',
+    img: '',
+    description:
+      'AAA This is a description that returns onto a maximum number of lines to be defined. It may also be truncated at 3 or 4 lines.\n\n* **1,666.58 NEB**\n* Distribution strategy: Pro rata \n* Reward pool amount and asset\n* Another bullet point\n* Another bullet point',
+    tags: [
+      { text: 'best reward ever', variant: 'primary' },
+      { text: 'another', variant: 'secondary' },
+      { text: 'foo', variant: 'tertiary' },
+    ],
+  },
+  {
+    rewardId:
+      'a067c9f3f0d0e8e032050e84893c909fb6140e00fb7145d81fe6786d3efe7854',
+    title: 'Reward B',
+    img: '',
+    description:
+      'BBB This is a *description* that returns onto a maximum number of lines to be defined. It may also be truncated at 3 or 4 lines.\n\n* **1,666.58 NEB**\n* Distribution strategy: Pro rata \n* Reward pool amount and asset\n* Another bullet point\n* Another bullet point',
+    tags: [{ text: 'best reward ever', variant: 'primary' }],
+  },
+  {
+    rewardId:
+      '9584bc79fd8b6db70df612c957a495fa0ca30a49c9be2d09c045ae5a4653d892',
+    title: 'Reward C',
+    img: '',
+    description:
+      'CCC This is a description that returns onto a maximum number of lines to be defined. It may also be truncated at 3 or 4 lines.\n\n* **1,666.58 NEB**\n* Distribution strategy: Pro rata \n* Reward pool amount and asset',
+    tags: [{ text: 'best reward ever', variant: 'secondary' }],
+  },
+  */
+];
