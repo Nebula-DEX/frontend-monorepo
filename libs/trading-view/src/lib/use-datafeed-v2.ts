@@ -14,6 +14,7 @@ import {
   candleDataQueryOptionsV2,
   marketOptions,
 } from '@vegaprotocol/rest';
+import { TRADINGVIEW_SESSION_CONFIG } from './constants';
 
 const EXCHANGE = 'Nebula';
 
@@ -107,8 +108,10 @@ export const useDatafeedV2 = (marketId: string) => {
             : market.data.state !== 'STATE_ACTIVE' &&
               market.data.state !== 'STATE_SUSPENDED';
 
-          const timezone = market.timezone || 'Etc/UTC';
-          const session = market.session || '24x7';
+          const sessionData = TRADINGVIEW_SESSION_CONFIG[market.id];
+          const timezone =
+            market.timezone || sessionData?.timezone || 'Etc/UTC';
+          const session = market.session || sessionData?.session || '24x7';
 
           const symbolInfo: LibrarySymbolInfo = {
             ticker: market.id, // use ticker as our unique identifier so that code/name can be used for name/description
