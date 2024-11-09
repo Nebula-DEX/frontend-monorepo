@@ -10,6 +10,7 @@ export {
   type Candle,
 } from './queries/candle-data-v2';
 export { type RewardCard } from './queries/reward-cards';
+export { useTrades } from './hooks/use-trades';
 
 export { yesterday, toNanoSeconds } from './utils/datetime';
 export { Decimal } from './utils/numbers';

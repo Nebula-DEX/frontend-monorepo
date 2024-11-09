@@ -73,28 +73,38 @@ const MainGrid = memo(
                           <TradingViews.chart.component marketId={market.id} />
                         </ErrorBoundary>
                       </Tab>
-                      <Tab id="depth" name={t('Depth')}>
-                        <ErrorBoundary feature="depth">
-                          <TradingViews.depth.component marketId={market.id} />
-                        </ErrorBoundary>
-                      </Tab>
-                      <Tab id="liquidity" name={t('Liquidity')}>
-                        <ErrorBoundary feature="liquidity">
-                          <TradingViews.liquidity.component
-                            marketId={market.id}
-                          />
-                        </ErrorBoundary>
-                      </Tab>
-                      {market &&
-                      market.tradableInstrument.instrument.product
-                        .__typename === 'Perpetual' ? (
-                        <Tab id="funding-history" name={t('Funding history')}>
-                          <ErrorBoundary feature="funding-history">
-                            <TradingViews.funding.component
-                              marketId={market.id}
-                            />
-                          </ErrorBoundary>
-                        </Tab>
+                      {market.tradableInstrument.instrument.product
+                        .__typename !== 'Spot' ? (
+                        <>
+                          <Tab id="depth" name={t('Depth')}>
+                            <ErrorBoundary feature="depth">
+                              <TradingViews.depth.component
+                                marketId={market.id}
+                              />
+                            </ErrorBoundary>
+                          </Tab>
+                          <Tab id="liquidity" name={t('Liquidity')}>
+                            <ErrorBoundary feature="liquidity">
+                              <TradingViews.liquidity.component
+                                marketId={market.id}
+                              />
+                            </ErrorBoundary>
+                          </Tab>
+                          {market &&
+                          market.tradableInstrument.instrument.product
+                            .__typename === 'Perpetual' ? (
+                            <Tab
+                              id="funding-history"
+                              name={t('Funding history')}
+                            >
+                              <ErrorBoundary feature="funding-history">
+                                <TradingViews.funding.component
+                                  marketId={market.id}
+                                />
+                              </ErrorBoundary>
+                            </Tab>
+                          ) : null}
+                        </>
                       ) : null}
                     </Tabs>
                   </ResizableGridPanelChild>

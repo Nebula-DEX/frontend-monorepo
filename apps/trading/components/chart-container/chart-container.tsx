@@ -9,17 +9,27 @@ import { useEnvironment } from '@vegaprotocol/environment';
 import { useChartSettings } from './use-chart-settings';
 import { SUPPORTED_INTERVALS, type SupportedInterval } from './constants';
 import { useT } from '../../lib/use-t';
+import { useMarket } from '@vegaprotocol/rest';
+import { SpotMarketChartContainer } from './spot-market-chart';
 
 /**
  * Renders either the pennant chart or the tradingview chart
  */
 export const ChartContainer = ({ marketId }: { marketId: string }) => {
   const t = useT();
+  const { data: market } = useMarket(marketId);
   const { CHARTING_LIBRARY_PATH, CHARTING_LIBRARY_HASH } = useEnvironment();
 
   const { interval, setInterval } = useChartSettings();
 
   const fallback = <p>{t('Chart initialization failed')}</p>;
+
+  if (!market) return null;
+
+  // Special case for NEB/USDT spot market
+  if (market.type === 'spot') {
+    return <SpotMarketChartContainer market={market} />;
+  }
 
   if (!ALLOWED_TRADINGVIEW_HOSTNAMES.includes(window.location.hostname)) {
     return fallback;
