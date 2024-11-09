@@ -681,7 +681,8 @@ export const OpenVolumeCell = ({
 
   const notional = addDecimalsFormatNumber(
     data.notional,
-    data.marketDecimalPlaces
+    data.marketDecimalPlaces,
+    0 // All markets settle in NEB so no decimals necessary
   );
 
   const cellContent = (
@@ -694,7 +695,7 @@ export const OpenVolumeCell = ({
           valueFormatted
         )
       }
-      secondary={notional}
+      secondary={`${notional} ${data.notionalSymbol}`}
     />
   );
 

@@ -23,6 +23,7 @@ import {
   type MarketInfo,
   getProductType,
   isFuture,
+  getBaseUnit,
 } from '@vegaprotocol/markets';
 import {
   PositionsDocument,
@@ -53,6 +54,7 @@ export interface Position {
   maintenanceLevel: MarginFieldsFragment['maintenanceLevel'] | undefined;
   assetId: string;
   assetSymbol: string;
+  notionalSymbol: string;
   averageEntryPrice: string;
   currentLeverage: number | undefined;
   assetDecimals: number;
@@ -114,8 +116,13 @@ export const getMetrics = (
         account.type === AccountType.ACCOUNT_TYPE_ORDER_MARGIN
       );
     });
-    const asset = getAsset(market);
+
     const productType = getProductType(market);
+    const asset = getAsset(market);
+    const notionalSymbol =
+      productType === 'Spot'
+        ? getBaseUnit(market.tradableInstrument.instrument.metadata.tags)
+        : asset.symbol;
     const product = market.tradableInstrument.instrument.product;
 
     const generalAccount = accounts?.find(
@@ -172,6 +179,7 @@ export const getMetrics = (
       maintenanceLevel: margin?.maintenanceLevel,
       assetId: asset.id,
       assetSymbol: asset.symbol,
+      notionalSymbol,
       averageEntryPrice: position.averageEntryPrice,
       currentLeverage,
       assetDecimals: asset.decimals,

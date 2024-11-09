@@ -31,6 +31,10 @@ describe('number utils', () => {
     }
   );
 
+  it('formats with addDecimalsFormatNumber with format decimals', () => {
+    expect(addDecimalsFormatNumber('123456', 3, 0)).toStrictEqual('123');
+  });
+
   it.each([
     { v: '1234000000000000000', d: 18, q: '1000000000000000000', o: '1.23' }, //vega
     { v: '1235000000000000000', d: 18, q: '1000000000000000000', o: '1.24' }, //vega
