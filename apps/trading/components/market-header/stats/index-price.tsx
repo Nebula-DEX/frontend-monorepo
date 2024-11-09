@@ -13,10 +13,12 @@ export const IndexPriceStat = ({
   marketId,
   decimalPlaces,
   markPriceConfiguration,
+  formatDecimals,
 }: {
   marketId: string;
   decimalPlaces: number;
   markPriceConfiguration: MarketFieldsFragment['markPriceConfiguration'];
+  formatDecimals?: number;
 }) => {
   const { VEGA_EXPLORER_URL } = useEnvironment();
   const t = useT();
@@ -57,7 +59,11 @@ export const IndexPriceStat = ({
       }
       data-testid="index-price"
     >
-      <IndexPrice marketId={marketId} decimalPlaces={decimalPlaces} />
+      <IndexPrice
+        marketId={marketId}
+        decimalPlaces={decimalPlaces}
+        formatDecimals={formatDecimals}
+      />
     </HeaderStat>
   );
 };
@@ -65,15 +71,21 @@ export const IndexPriceStat = ({
 export const IndexPrice = ({
   marketId,
   decimalPlaces,
+  formatDecimals,
 }: {
   marketId: string;
   decimalPlaces?: number;
+  formatDecimals?: number;
 }) => {
   const { data: externalTwap } = useExternalTwap(marketId);
   return externalTwap && decimalPlaces ? (
     <PriceCell
       value={Number(externalTwap)}
-      valueFormatted={addDecimalsFormatNumber(externalTwap, decimalPlaces)}
+      valueFormatted={addDecimalsFormatNumber(
+        externalTwap,
+        decimalPlaces,
+        formatDecimals
+      )}
     />
   ) : (
     '-'
