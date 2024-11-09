@@ -32,6 +32,7 @@ import { CompetitionsGame } from '../client-pages/competitions/competitions-game
 import { Swap } from '../client-pages/swap/swap';
 import { Invite } from '../client-pages/invite';
 import { BuyNeb } from '../client-pages/buy-neb';
+import { ClaimNeb } from '../client-pages/claim-neb';
 import { NotFound } from '../client-pages/not-found';
 
 import { LayoutCentered, LayoutFull } from '../components/layouts';
@@ -256,6 +257,14 @@ export const useRouterConfig = (): RouteObject[] => {
       element: (
         <LayoutCentered>
           <BuyNeb />
+        </LayoutCentered>
+      ),
+    },
+    {
+      path: AppRoutes.CLAIM_NEB,
+      element: (
+        <LayoutCentered>
+          <ClaimNeb />
         </LayoutCentered>
       ),
     },
