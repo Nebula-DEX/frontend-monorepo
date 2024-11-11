@@ -118,19 +118,16 @@ export const NonSwapInfo = (props: {
   nextBestAsk?: { price: string; volume: string; numberOfOrders: string };
   toAsset?: AssetERC20;
   market: { decimalPlaces: number; positionDecimalPlaces: number };
+  amount: string;
 }) => {
   const t = useT();
   return (
     <dl className="text-xs">
       {props.toAsset && (
         <div className="grid grid-cols-2">
-          <dt className="text-surface-1-fg-muted">{t('USDT')} (est)</dt>
+          <dt className="text-surface-1-fg-muted">{t('USDT')}</dt>
           <dd className="text-right">
-            {addDecimalsFormatNumber(
-              props.estimatedAmount,
-              props.toAsset.decimals
-            )}{' '}
-            {props.toAsset.symbol}
+            {props.amount || '0'} {props.toAsset.symbol}
           </dd>
         </div>
       )}

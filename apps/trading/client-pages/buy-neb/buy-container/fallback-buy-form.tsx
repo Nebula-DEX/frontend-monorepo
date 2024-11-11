@@ -37,6 +37,9 @@ export const FallbackBuyForm = (props: {
     bestAsk,
     nextBestAsk,
     onSubmit,
+    depositCheck,
+    orderCheck,
+    fields,
   } = useFallbackBuyForm(props);
 
   let symbol = undefined;
@@ -63,6 +66,7 @@ export const FallbackBuyForm = (props: {
             nextBestAsk={nextBestAsk}
             toAsset={toAsset}
             market={props.market}
+            amount={fields.amount}
           />
         </div>
         <SubmitButton estimatedAmount={estimatedAmount} />
@@ -72,6 +76,8 @@ export const FallbackBuyForm = (props: {
         depositData={deposit.data}
         orderTx={tx}
         onChange={deposit.reset}
+        depositCheck={depositCheck}
+        orderCheck={orderCheck}
       />
     </FormProvider>
   );

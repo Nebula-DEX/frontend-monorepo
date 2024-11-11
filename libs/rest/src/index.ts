@@ -1,5 +1,10 @@
 export * from './hooks';
 
+export {
+  type AccountType,
+  queryKeys as accountsQueryKeys,
+  accountsQueryOptions,
+} from './queries/accounts';
 export { type AMM, AMMStatus, isActiveAMM } from './queries/amms';
 export { type Asset } from './queries/assets';
 export { isActiveMarket, type Market, marketOptions } from './queries/markets';
