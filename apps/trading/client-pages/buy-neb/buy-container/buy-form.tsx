@@ -13,6 +13,7 @@ import { FeedbackDialog, SquidFeedbackDialog } from './feedback-dialog';
 import { useBuyForm } from './use-buy-form';
 import { useVegaWallet } from '@vegaprotocol/wallet-react';
 import type { RouteResponse } from '@0xsquid/sdk/dist/types';
+import type { Market } from '@vegaprotocol/rest';
 
 export const BuyForm = (props: {
   address: string;
@@ -23,10 +24,7 @@ export const BuyForm = (props: {
   configs: Configs;
   minAmount?: string;
   asks?: Array<{ price: string; volume: string; numberOfOrders: string }>;
-  market: {
-    decimalPlaces: number;
-    positionDecimalPlaces: number;
-  };
+  market: Market;
 }) => {
   const { pubKeys } = useVegaWallet();
   const {

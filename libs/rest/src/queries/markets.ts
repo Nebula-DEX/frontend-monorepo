@@ -43,8 +43,20 @@ const baseSchema = z.object({
   /** Quote symbol, eg USD in XAU/USD */
   quoteSymbol: z.string(),
 
-  /** Liquidity fee factor */
+  /** Maker fee factor, paid to the passive side of the trade  */
+  makerFee: z.number(),
+
+  /** Liquidity fee factor, paid to liquidity providers */
   liquidityFee: z.number(),
+
+  /** Infra fee factor, paid to validators */
+  infraFee: z.number(),
+
+  /** Take from taker and used to purchase tokens through automated purchase programs */
+  buyBackFee: z.number(),
+
+  /** Taken from taker and sent to network treasury */
+  treasuryFee: z.number(),
 
   /** Asset the market settles in */
   settlementAsset: erc20AssetSchema,
@@ -210,6 +222,12 @@ function mapMarket(m: vegaMarket, assets: Assets) {
     quoteAsset,
     quoteSymbol,
     liquidityFee: Number(m.fees?.factors?.liquidityFee),
+    makerFee: Number(m.fees?.factors?.makerFee),
+    infraFee: Number(m.fees?.factors?.infrastructureFee),
+    // @ts-ignore TODO: upgrade rest clients version
+    buyBackFee: Number(m.fees?.factors?.buyBackFee),
+    // @ts-ignore TODO: upgrade rest clients version
+    treasuryFee: Number(m.fees?.factors?.treasuryFee),
     data: {
       state: m.state,
     },

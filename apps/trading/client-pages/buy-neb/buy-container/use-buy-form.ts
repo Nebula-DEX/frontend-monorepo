@@ -21,7 +21,11 @@ import { localLoggerFactory } from '@vegaprotocol/logger';
 import { useT } from '../../../lib/use-t';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { accountsQueryOptions, useAccounts } from '@vegaprotocol/rest';
+import {
+  accountsQueryOptions,
+  type Market,
+  useAccounts,
+} from '@vegaprotocol/rest';
 import { vegaAccountType } from '@vegaprotocol/rest-clients/dist/trading-data';
 import { APP_TOKEN_ID, USDT_ID } from 'apps/trading/lib/constants';
 
@@ -44,10 +48,7 @@ export const useBuyForm = (props: {
   configs: Configs;
   minAmount?: string;
   asks?: Array<{ price: string; volume: string; numberOfOrders: string }>;
-  market: {
-    decimalPlaces: number;
-    positionDecimalPlaces: number;
-  };
+  market: Market;
 }) => {
   const [depositCheck, setDepositCheck] = useState<OrderCheck>('idle');
   const [swapCheck, setSwapCheck] = useState<OrderCheck>('idle');
@@ -140,8 +141,7 @@ export const useBuyForm = (props: {
 
     // amount of deposited arbitrum usdt
     const amount = BigInt(res.data.result.amount);
-    const price = BigInt(bestAsk.price);
-    const size = String(amount / price);
+    const size = getFeeAdjustedAmount(amount, price, props.market);
 
     const orderSubmission = {
       marketId: SWAP_MARKET_ID,
@@ -149,8 +149,11 @@ export const useBuyForm = (props: {
       type: OrderType.TYPE_LIMIT,
       price: bestAsk.price,
       timeInForce: OrderTimeInForce.TIME_IN_FORCE_FOK,
-      size,
+      size: size.toString(),
     };
+
+    logger.log('executing spot buy', orderSubmission);
+
     return tx.send({ orderSubmission });
   };
 
@@ -338,28 +341,23 @@ export const useBuyForm = (props: {
   });
 
   let estimatedAmount = '0';
+  const price = BigInt(bestAsk?.price ?? 0); // Price of NEB in USDT
 
   if (isSwap) {
     // Estimate the final amount after deposit and swap
     const toAmount = BigInt(route.data?.route.estimate.toAmount ?? 0); // USDT
-    const price = BigInt(bestAsk?.price ?? 0); // Price of NEB in USDT
-
-    // The estimated amount of NEB that will be received, note fees on spot market are set
-    // to 0 so this should be the final amount
+    const adjustedAmount = getFeeAdjustedAmount(toAmount, price, props.market);
     estimatedAmount = toBigNum(
-      String(toAmount / price),
+      adjustedAmount.toString(),
       props.market.positionDecimalPlaces
     ).toString();
   } else {
     // Estimate the final amount after deposit and swap
     const amount = toAsset ? removeDecimal(fields.amount, toAsset.decimals) : 0;
     const toAmount = BigInt(amount ?? 0); // Amount in USDT
-    const price = BigInt(bestAsk?.price ?? 0); // Price of NEB in USDT
-
-    // The estimated amount of NEB that will be received, note fees on spot market are set
-    // to 0 so this should be the final amount
+    const adjustedAmount = getFeeAdjustedAmount(toAmount, price, props.market);
     estimatedAmount = toBigNum(
-      String(toAmount / price),
+      adjustedAmount.toString(),
       props.market.positionDecimalPlaces
     ).toString();
   }
@@ -412,4 +410,23 @@ export function getBalances(accounts: ReturnType<typeof useAccounts>['data']) {
 
 export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function getFeeAdjustedAmount(
+  amount: bigint,
+  price: bigint,
+  market: Market
+) {
+  const feeFactor = BigNumber(market.makerFee)
+    .plus(market.liquidityFee)
+    .plus(market.infraFee)
+    .plus(market.buyBackFee)
+    .plus(market.treasuryFee);
+  const size = amount / price;
+  const notional = size * price;
+  const feeAmount = BigNumber(String(notional)).times(feeFactor);
+  // Amount adjusted for fees
+  const feeAdjustedAmount = BigNumber(String(size)).minus(feeAmount);
+
+  return feeAdjustedAmount;
 }

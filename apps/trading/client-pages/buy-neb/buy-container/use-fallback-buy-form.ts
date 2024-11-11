@@ -23,8 +23,17 @@ import { MAX_BUY_USDT, SWAP_MARKET_ID } from './buy-container';
 import { OrderTimeInForce, OrderType, Side } from '@vegaprotocol/types';
 import { removeDecimal, toBigNum } from '@vegaprotocol/utils';
 import { useState } from 'react';
-import { getBalances, type OrderCheck, sleep } from './use-buy-form';
-import { accountsQueryOptions, useAccounts } from '@vegaprotocol/rest';
+import {
+  getBalances,
+  getFeeAdjustedAmount,
+  type OrderCheck,
+  sleep,
+} from './use-buy-form';
+import {
+  accountsQueryOptions,
+  type Market,
+  useAccounts,
+} from '@vegaprotocol/rest';
 import { useQueryClient } from '@tanstack/react-query';
 import { vegaAccountType } from '@vegaprotocol/rest-clients/dist/trading-data';
 
@@ -36,10 +45,7 @@ export const useFallbackBuyForm = (props: {
   configs: Configs;
   minAmount?: string;
   asks?: Array<{ price: string; volume: string; numberOfOrders: string }>;
-  market: {
-    decimalPlaces: number;
-    positionDecimalPlaces: number;
-  };
+  market: Market;
 }) => {
   const { pubKey } = useVegaWallet();
   const queryClient = useQueryClient();
@@ -103,7 +109,7 @@ export const useFallbackBuyForm = (props: {
     // amount of deposited arbitrum usdt
     const amount = BigInt(res.data.result.amount);
     const price = BigInt(bestAsk.price);
-    const size = String(amount / price);
+    const size = getFeeAdjustedAmount(amount, price, props.market);
 
     const orderSubmission = {
       marketId: SWAP_MARKET_ID,
@@ -111,8 +117,11 @@ export const useFallbackBuyForm = (props: {
       type: OrderType.TYPE_LIMIT,
       price: bestAsk.price,
       timeInForce: OrderTimeInForce.TIME_IN_FORCE_FOK,
-      size,
+      size: size.toString(),
     };
+
+    logger.log('executing spot buy', orderSubmission);
+
     return tx.send({ orderSubmission });
   };
 
@@ -212,8 +221,9 @@ export const useFallbackBuyForm = (props: {
 
   // The estimated amount of NEB that will be received, note fees on spot market are set
   // to 0 so this should be the final amount
+  const adjustedAmount = getFeeAdjustedAmount(toAmount, price, props.market);
   const estimatedAmount = toBigNum(
-    String(toAmount / price),
+    adjustedAmount.toString(),
     props.market.positionDecimalPlaces
   ).toString();
 

@@ -7,7 +7,12 @@ import {
 import { type ReactNode } from 'react';
 import { addDecimalsFormatNumber } from '@vegaprotocol/utils';
 import { useT } from '../../../lib/use-t';
-import { BlockExplorerLink } from '@vegaprotocol/environment';
+import {
+  BlockExplorerLink,
+  DApp,
+  EXPLORER_TX,
+  useLinks,
+} from '@vegaprotocol/environment';
 import { type TxDeposit, type TxSquidDeposit } from '../../../stores/evm';
 
 import {
@@ -163,50 +168,10 @@ const Content = (props: {
               </>
             )}
           </FeedbackStep>
-          <FeedbackStep
-            pending={
-              props.orderTx?.status === 'Requested' ||
-              props.orderTx?.status === 'Pending' ||
-              props.orderCheck === 'pending'
-            }
-            complete={
-              props.orderTx?.status === 'Confirmed' &&
-              props.orderCheck === 'success'
-            }
-            failed={props.orderCheck === 'fail'}
-          >
-            <p>{t('Approve spot order')}</p>
-            {props.orderCheck === 'fail' ? (
-              <p className="text-sm text-intent-warning">
-                <Trans
-                  i18nKey="The spot market order might not have worked, <0>click here</0> to check on Console"
-                  components={[
-                    <Link
-                      key="link"
-                      to={Links.PORTFOLIO()}
-                      className="underline underline-offset-4"
-                    >
-                      click here
-                    </Link>,
-                  ]}
-                />
-              </p>
-            ) : (
-              <>
-                {props.orderTx?.status === 'Requested' && (
-                  <p className="text-surface-0-fg-muted text-sm">
-                    {t('Confirm in wallet...')}
-                  </p>
-                )}
-                {props.orderTx?.status === 'Confirmed' &&
-                  props.orderCheck === 'success' && (
-                    <p className="text-surface-0-fg-muted text-sm">
-                      {t('Spot order confirmed')}
-                    </p>
-                  )}
-              </>
-            )}
-          </FeedbackStep>
+          <OrderFeedbackStep
+            orderTx={props.orderTx}
+            orderCheck={props.orderCheck}
+          />
         </div>
       ) : (
         <div className="flex flex-col gap-1">
@@ -347,50 +312,10 @@ const SquidContent = (props: {
               </>
             )}
           </FeedbackStep>
-          <FeedbackStep
-            pending={
-              props.orderTx?.status === 'Requested' ||
-              props.orderTx?.status === 'Pending' ||
-              props.orderCheck === 'pending'
-            }
-            complete={
-              props.orderTx?.status === 'Confirmed' &&
-              (props.orderCheck === 'fail' || props.orderCheck === 'success')
-            }
-            failed={props.orderCheck === 'fail'}
-          >
-            <p>{t('Approve spot order')}</p>
-            {props.orderCheck === 'fail' ? (
-              <p className="text-sm text-intent-warning">
-                <Trans
-                  i18nKey="The spot market order might not have worked, <0>click here</0> to check on Console"
-                  components={[
-                    <Link
-                      key="link"
-                      to={Links.PORTFOLIO()}
-                      className="underline underline-offset-4"
-                    >
-                      click here
-                    </Link>,
-                  ]}
-                />
-              </p>
-            ) : (
-              <>
-                {props.orderTx?.status === 'Requested' && (
-                  <p className="text-surface-0-fg-muted text-sm">
-                    {t('Confirm in wallet...')}
-                  </p>
-                )}
-                {props.orderTx?.status === 'Confirmed' &&
-                  props.orderCheck === 'success' && (
-                    <p className="text-surface-0-fg-muted text-sm">
-                      {t('Spot order confirmed')}
-                    </p>
-                  )}
-              </>
-            )}
-          </FeedbackStep>
+          <OrderFeedbackStep
+            orderTx={props.orderTx}
+            orderCheck={props.orderCheck}
+          />
         </div>
       ) : (
         <div className="flex flex-col gap-1">
@@ -444,4 +369,86 @@ function isUserRejected(err: unknown) {
     return true;
   }
   return false;
+}
+
+function OrderFeedbackStep(props: {
+  orderTx?: ReturnType<typeof useSimpleTransaction>;
+  orderCheck: OrderCheck;
+}) {
+  const t = useT();
+  const explorerLink = useLinks(DApp.Explorer);
+
+  const failContent = (
+    <>
+      <p className="text-intent-danger text-sm">{t('Spot order failed')}</p>
+      {props.orderTx?.error && (
+        <p className="text-sm text-surface-0-fg-muted first-letter:capitalize">
+          {props.orderTx?.error}
+        </p>
+      )}
+      {props.orderTx?.result?.txHash && (
+        <Link
+          to={explorerLink(
+            EXPLORER_TX.replace(':hash', props.orderTx.result.txHash)
+          )}
+          className="text-sm text-surface-0-fg-muted"
+        >
+          {t('View on explorer')}
+        </Link>
+      )}
+    </>
+  );
+
+  return (
+    <FeedbackStep
+      pending={
+        props.orderTx?.status === 'Requested' ||
+        props.orderTx?.status === 'Pending' ||
+        props.orderCheck === 'pending'
+      }
+      complete={
+        props.orderTx?.status === 'Confirmed' && props.orderCheck === 'success'
+      }
+      failed={props.orderCheck === 'fail'}
+    >
+      <p>{t('Approve spot order')}</p>
+      {props.orderCheck === 'fail' ? (
+        <>
+          {props.orderTx?.status === 'Failed' ? (
+            <>{failContent}</>
+          ) : (
+            <p className="text-sm text-intent-warning">
+              <Trans
+                i18nKey="The spot market order might not have worked, <0>click here</0> to check on Console"
+                components={[
+                  <Link
+                    key="link"
+                    to={Links.PORTFOLIO()}
+                    className="underline underline-offset-4"
+                  >
+                    click here
+                  </Link>,
+                ]}
+              />
+            </p>
+          )}
+        </>
+      ) : (
+        <>
+          {props.orderTx?.status === 'Requested' && (
+            <p className="text-surface-0-fg-muted text-sm">
+              {t('Confirm in wallet...')}
+            </p>
+          )}
+          {props.orderTx?.status === 'Confirmed' &&
+            props.orderCheck === 'success' && (
+              <p className="text-surface-0-fg-muted text-sm">
+                {t('Spot order confirmed')}
+              </p>
+            )}
+          {props.orderTx?.status === 'Failed' && <>{failContent}</>}
+        </>
+      )}
+    </FeedbackStep>
+  );
 }

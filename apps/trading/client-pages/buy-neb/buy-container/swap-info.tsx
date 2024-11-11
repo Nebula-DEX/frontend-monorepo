@@ -6,6 +6,7 @@ import { TradingInputError } from '@vegaprotocol/ui-toolkit';
 import { useT } from '../../../lib/use-t';
 import { APP_SYMBOL } from '../../../lib/constants';
 import type { AssetERC20 } from '@vegaprotocol/assets';
+import type { Market } from '@vegaprotocol/rest';
 
 export const SwapInfo = (props: {
   route?: RouteResponse['route'];
@@ -13,7 +14,7 @@ export const SwapInfo = (props: {
   error: Error | null;
   bestAsk?: { price: string; volume: string; numberOfOrders: string };
   nextBestAsk?: { price: string; volume: string; numberOfOrders: string };
-  market: { decimalPlaces: number; positionDecimalPlaces: number };
+  market: Market;
 }) => {
   const t = useT();
   const error = props.error;
@@ -117,7 +118,7 @@ export const NonSwapInfo = (props: {
   bestAsk?: { price: string; volume: string; numberOfOrders: string };
   nextBestAsk?: { price: string; volume: string; numberOfOrders: string };
   toAsset?: AssetERC20;
-  market: { decimalPlaces: number; positionDecimalPlaces: number };
+  market: Market;
   amount: string;
 }) => {
   const t = useT();
