@@ -22,6 +22,11 @@ import { localLoggerFactory } from '@vegaprotocol/logger';
 import { MAX_BUY_USDT, SWAP_MARKET_ID } from './buy-container';
 import { OrderTimeInForce, OrderType, Side } from '@vegaprotocol/types';
 import { removeDecimal, toBigNum } from '@vegaprotocol/utils';
+import { useState } from 'react';
+import { getBalances, type OrderCheck, sleep } from './use-buy-form';
+import { accountsQueryOptions, useAccounts } from '@vegaprotocol/rest';
+import { useQueryClient } from '@tanstack/react-query';
+import { vegaAccountType } from '@vegaprotocol/rest-clients/dist/trading-data';
 
 const logger = localLoggerFactory({ application: 'buy-neb-fallback' });
 
@@ -36,10 +41,19 @@ export const useFallbackBuyForm = (props: {
     positionDecimalPlaces: number;
   };
 }) => {
+  const { pubKey } = useVegaWallet();
+  const queryClient = useQueryClient();
+  const [depositCheck, setDepositCheck] = useState<OrderCheck>('idle');
+  const [orderCheck, setOrderCheck] = useState<OrderCheck>('idle');
+
+  const accountsParams = {
+    partyId: pubKey!,
+    type: vegaAccountType.ACCOUNT_TYPE_GENERAL,
+  };
+  const { data: accounts } = useAccounts(accountsParams);
   const bestAsk = props?.asks ? props.asks[0] : undefined;
   const nextBestAsk = props?.asks ? props.asks[1] : undefined;
   const tx = useSimpleTransaction();
-  const { pubKey } = useVegaWallet();
 
   const { address } = useAccount();
   const chainId = useChainId();
@@ -99,7 +113,7 @@ export const useFallbackBuyForm = (props: {
       timeInForce: OrderTimeInForce.TIME_IN_FORCE_FOK,
       size,
     };
-    tx.send({ orderSubmission });
+    return tx.send({ orderSubmission });
   };
 
   const onSubmit = form.handleSubmit(async (fields) => {
@@ -130,6 +144,10 @@ export const useFallbackBuyForm = (props: {
       return;
     }
 
+    // Balances before the swap, so we can compare and make sure that the
+    // squid swap and the spot buy were successful
+    const { usdt, neb } = getBalances(accounts);
+
     const res = await deposit.write({
       asset: toAsset,
       bridgeAddress: bridgeAddress as `0x${string}`,
@@ -141,7 +159,36 @@ export const useFallbackBuyForm = (props: {
     });
 
     if (res.status === 'finalized' && res.data?.result) {
-      executeSpotBuy(res);
+      setDepositCheck('pending');
+      await sleep(1000 * 10);
+
+      let data = await queryClient.fetchQuery(
+        accountsQueryOptions(queryClient, accountsParams)
+      );
+      let balances = getBalances(data);
+
+      if (balances.usdt.isLessThanOrEqualTo(usdt)) {
+        setDepositCheck('fail');
+        return;
+      } else {
+        setDepositCheck('success');
+      }
+
+      await executeSpotBuy(res);
+
+      setOrderCheck('pending');
+      await sleep(1000 * 60);
+
+      data = await queryClient.fetchQuery(
+        accountsQueryOptions(queryClient, accountsParams)
+      );
+      balances = getBalances(data);
+
+      if (balances.neb.isLessThanOrEqualTo(neb)) {
+        setOrderCheck('fail');
+      } else {
+        setOrderCheck('success');
+      }
     } else {
       logger.error(
         `fallback deposit failed and spot buy could not be executed: ${JSON.stringify(
@@ -150,6 +197,13 @@ export const useFallbackBuyForm = (props: {
       );
     }
   });
+
+  const reset = () => {
+    form.reset();
+    tx.reset();
+    setDepositCheck('idle');
+    setOrderCheck('idle');
+  };
 
   // Estimate the final amount after deposit and swap
   const amount = toAsset ? removeDecimal(fields.amount, toAsset.decimals) : 0;
@@ -175,5 +229,9 @@ export const useFallbackBuyForm = (props: {
     estimatedAmount,
     bestAsk,
     nextBestAsk,
+    depositCheck,
+    orderCheck,
+    reset,
+    fields,
   };
 };

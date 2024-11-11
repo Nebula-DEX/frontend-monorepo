@@ -19,6 +19,13 @@ import { useSimpleTransaction } from '@vegaprotocol/wallet-react';
 import { removeDecimal, toBigNum } from '@vegaprotocol/utils';
 import { localLoggerFactory } from '@vegaprotocol/logger';
 import { useT } from '../../../lib/use-t';
+import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { accountsQueryOptions, useAccounts } from '@vegaprotocol/rest';
+import { vegaAccountType } from '@vegaprotocol/rest-clients/dist/trading-data';
+import { APP_TOKEN_ID, USDT_ID } from 'apps/trading/lib/constants';
+
+export type OrderCheck = 'idle' | 'pending' | 'success' | 'fail';
 
 const logger = localLoggerFactory({
   application: 'buy-neb',
@@ -42,6 +49,16 @@ export const useBuyForm = (props: {
     positionDecimalPlaces: number;
   };
 }) => {
+  const [depositCheck, setDepositCheck] = useState<OrderCheck>('idle');
+  const [swapCheck, setSwapCheck] = useState<OrderCheck>('idle');
+  const [orderCheck, setOrderCheck] = useState<OrderCheck>('idle');
+
+  const accountsParams = {
+    partyId: props.pubKey,
+    type: vegaAccountType.ACCOUNT_TYPE_GENERAL,
+  };
+  const { data: accounts } = useAccounts(accountsParams);
+  const queryClient = useQueryClient();
   const t = useT();
   const bestAsk = props?.asks ? props.asks[0] : undefined;
   const nextBestAsk = props?.asks ? props.asks[1] : undefined;
@@ -134,7 +151,7 @@ export const useBuyForm = (props: {
       timeInForce: OrderTimeInForce.TIME_IN_FORCE_FOK,
       size,
     };
-    tx.send({ orderSubmission });
+    return tx.send({ orderSubmission });
   };
 
   const onSubmit = form.handleSubmit(async (fields) => {
@@ -192,6 +209,10 @@ export const useBuyForm = (props: {
         return;
       }
 
+      // Balances before the swap, so we can compare and make sure that the
+      // squid swap and the spot buy were successful
+      const { usdt, neb } = getBalances(accounts);
+
       const res = await squidDeposit.write({
         asset: toAsset,
         amount: fields.amount.toString(),
@@ -201,7 +222,36 @@ export const useBuyForm = (props: {
       });
 
       if (res.status === 'finalized' && res.data?.result) {
-        executeSpotBuy(res);
+        setSwapCheck('pending');
+        await sleep(1000 * 10);
+
+        let data = await queryClient.fetchQuery(
+          accountsQueryOptions(queryClient, accountsParams)
+        );
+        let balances = getBalances(data);
+
+        if (balances.usdt.isLessThanOrEqualTo(usdt)) {
+          setSwapCheck('fail');
+          return;
+        } else {
+          setSwapCheck('success');
+        }
+
+        await executeSpotBuy(res);
+
+        setOrderCheck('pending');
+        await sleep(1000 * 60);
+
+        data = await queryClient.fetchQuery(
+          accountsQueryOptions(queryClient, accountsParams)
+        );
+        balances = getBalances(data);
+
+        if (balances.neb.isLessThanOrEqualTo(neb)) {
+          setOrderCheck('fail');
+        } else {
+          setOrderCheck('success');
+        }
       } else {
         logger.error(
           `squid deposit failed and spot buy could not be executed: ${JSON.stringify(
@@ -231,6 +281,10 @@ export const useBuyForm = (props: {
         return;
       }
 
+      // Balances before the swap, so we can compare and make sure that the
+      // squid swap and the spot buy were successful
+      const { usdt, neb } = getBalances(accounts);
+
       const res = await deposit.write({
         asset: toAsset,
         bridgeAddress: config.collateral_bridge_contract
@@ -243,7 +297,36 @@ export const useBuyForm = (props: {
       });
 
       if (res.status === 'finalized' && res.data?.result) {
-        executeSpotBuy(res);
+        setDepositCheck('pending');
+        await sleep(1000 * 10);
+
+        let data = await queryClient.fetchQuery(
+          accountsQueryOptions(queryClient, accountsParams)
+        );
+        let balances = getBalances(data);
+
+        if (balances.usdt.isLessThanOrEqualTo(usdt)) {
+          setDepositCheck('fail');
+          return;
+        } else {
+          setDepositCheck('success');
+        }
+
+        await executeSpotBuy(res);
+
+        setOrderCheck('pending');
+        await sleep(1000 * 60);
+
+        data = await queryClient.fetchQuery(
+          accountsQueryOptions(queryClient, accountsParams)
+        );
+        balances = getBalances(data);
+
+        if (balances.neb.isLessThanOrEqualTo(neb)) {
+          setOrderCheck('fail');
+        } else {
+          setOrderCheck('success');
+        }
       } else {
         logger.error(
           `normal deposit failed and spot buy could not be executed: ${JSON.stringify(
@@ -281,6 +364,15 @@ export const useBuyForm = (props: {
     ).toString();
   }
 
+  const reset = () => {
+    form.reset();
+    deposit.reset();
+    squidDeposit.reset();
+    setDepositCheck('idle');
+    setSwapCheck('idle');
+    setOrderCheck('idle');
+  };
+
   return {
     form,
 
@@ -301,5 +393,23 @@ export const useBuyForm = (props: {
     estimatedAmount,
     bestAsk,
     nextBestAsk,
+    depositCheck,
+    orderCheck,
+    swapCheck,
+    reset,
+    fields,
   };
 };
+
+export function getBalances(accounts: ReturnType<typeof useAccounts>['data']) {
+  const usdtAccount = accounts?.find((a) => a.asset.id === USDT_ID);
+  const usdt = usdtAccount ? usdtAccount.balance.value : BigNumber(0);
+  const nebAccount = accounts?.find((a) => a.asset.id === APP_TOKEN_ID);
+  const neb = nebAccount ? nebAccount.balance.value : BigNumber(0);
+
+  return { usdt, neb };
+}
+
+export function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

@@ -1,3 +1,5 @@
+import omitBy from 'lodash/omitBy';
+import isUndefined from 'lodash/isUndefined';
 import { removePaginationWrapper } from '@vegaprotocol/utils';
 import { restApiUrl } from '../paths';
 import {
@@ -14,8 +16,9 @@ const accountTypeSchema = z.nativeEnum(vegaAccountType);
 export type AccountType = z.infer<typeof accountTypeSchema>;
 
 const queryParamSchema = z.object({
-  'filter.accountTypes': accountTypeSchema.optional(),
-  'filter.assetId': z.string().optional(),
+  partyId: z.string(),
+  type: accountTypeSchema.optional(),
+  assetId: z.string().optional(),
 });
 
 export type QueryParams = z.input<typeof queryParamSchema>;
@@ -31,7 +34,7 @@ export type Reward = z.infer<typeof accountSchema>;
 
 const accountsSchema = z.array(accountSchema);
 
-export function accountsOptions(client: QueryClient, params: QueryParams) {
+export function accountsQueryOptions(client: QueryClient, params: QueryParams) {
   return queryOptions({
     queryKey: queryKeys.list(params),
     queryFn: () => retrieveAccounts(client, params),
@@ -45,11 +48,19 @@ export const retrieveAccounts = async (
 ) => {
   const endpoint = restApiUrl('/api/v2/accounts');
   const queryParams = queryParamSchema.parse(params);
+  const validParams = omitBy(
+    {
+      'filter.partyIds': queryParams.partyId,
+      'filter.assetId': queryParams.assetId,
+      'filter.accountTypes': queryParams.type,
+    },
+    isUndefined
+  ) as unknown as URLSearchParams;
 
   const [assets, res] = await Promise.all([
     getAssets(queryClient),
     axios.get<v2ListAccountsResponse>(endpoint, {
-      params: new URLSearchParams(queryParams),
+      params: new URLSearchParams(validParams),
     }),
   ]);
 

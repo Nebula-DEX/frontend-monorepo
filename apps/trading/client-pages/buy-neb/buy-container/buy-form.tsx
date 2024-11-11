@@ -45,6 +45,11 @@ export const BuyForm = (props: {
     nextBestAsk,
     toAsset,
     onSubmit,
+    depositCheck,
+    swapCheck,
+    orderCheck,
+    reset,
+    fields,
   } = useBuyForm(props);
 
   return (
@@ -86,6 +91,7 @@ export const BuyForm = (props: {
               nextBestAsk={nextBestAsk}
               toAsset={toAsset}
               market={props.market}
+              amount={fields.amount}
             />
           </div>
         )}
@@ -99,17 +105,21 @@ export const BuyForm = (props: {
           <FeedbackDialog
             depositData={deposit.data}
             orderTx={tx}
-            onChange={deposit.reset}
+            onChange={reset}
             estimatedAmount={estimatedAmount}
+            depositCheck={depositCheck}
+            orderCheck={orderCheck}
           />
         )}
         {isSwap && (
           <SquidFeedbackDialog
             depositData={squidDeposit.data}
             orderTx={tx}
-            onChange={squidDeposit.reset}
+            onChange={reset}
             asks={props.asks}
             estimatedAmount={estimatedAmount}
+            swapCheck={swapCheck}
+            orderCheck={orderCheck}
           />
         )}
       </form>

@@ -13,16 +13,23 @@ import { type TxDeposit, type TxSquidDeposit } from '../../../stores/evm';
 import {
   ConfirmedBadge,
   DefaultBadge,
+  FailedBadge,
   PendingBadge,
 } from '../../../components/transaction-dialog/transaction-badge';
 import { APP_SYMBOL, DEFAULT_DISPLAY_DPS } from '../../../lib/constants';
 import type { useSimpleTransaction } from '@vegaprotocol/wallet-react';
+import { Trans } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { Links } from 'apps/trading/lib/links';
+import type { OrderCheck } from './use-buy-form';
 
 type FeedbackDialogProps = {
   estimatedAmount: string;
   depositData?: TxDeposit;
   orderTx?: ReturnType<typeof useSimpleTransaction>;
   onChange: (open: boolean) => void;
+  depositCheck: OrderCheck;
+  orderCheck: OrderCheck;
 };
 
 export const FeedbackDialog = (props: FeedbackDialogProps) => {
@@ -38,6 +45,8 @@ export const FeedbackDialog = (props: FeedbackDialogProps) => {
           tx={props.depositData}
           orderTx={props.orderTx}
           estimatedAmount={props.estimatedAmount}
+          depositCheck={props.depositCheck}
+          orderCheck={props.orderCheck}
         />
       )}
     </Dialog>
@@ -48,6 +57,8 @@ const Content = (props: {
   tx: TxDeposit;
   estimatedAmount: string;
   orderTx: FeedbackDialogProps['orderTx'];
+  depositCheck: OrderCheck;
+  orderCheck: OrderCheck;
 }) => {
   const t = useT();
   const data = props.tx.data;
@@ -84,7 +95,7 @@ const Content = (props: {
           <FeedbackStep
             pending={
               data.approvalRequired
-                ? Boolean(data.approveHash && !data.approveReceipt)
+                ? !data.approveHash || !data.approveReceipt
                 : false
             }
             complete={
@@ -96,50 +107,104 @@ const Content = (props: {
               <BlockExplorerLink
                 sourceChainId={props.tx.chainId}
                 tx={data.approveHash}
-                className="text-sm"
+                className="text-sm text-surface-0-fg-muted"
               >
                 {t('View on explorer')}
               </BlockExplorerLink>
             )}
           </FeedbackStep>
           <FeedbackStep
-            pending={Boolean(data.depositHash && !data.depositReceipt)}
-            complete={Boolean(data.depositReceipt)}
+            pending={
+              !data.depositHash &&
+              (data.approvalRequired ? Boolean(data.approveReceipt) : true)
+            }
+            complete={Boolean(data.depositHash)}
           >
             <p>{t('Send deposit')}</p>
             {data.depositHash && (
               <BlockExplorerLink
                 sourceChainId={props.tx.chainId}
                 tx={data.depositHash}
-                className="text-sm"
+                className="text-sm text-surface-0-fg-muted"
               >
                 {t('View on explorer')}
               </BlockExplorerLink>
             )}
           </FeedbackStep>
           <FeedbackStep
-            pending={Boolean(data.depositHash && data.depositReceipt)}
-            complete={Boolean(props.tx.status === 'finalized')}
+            pending={
+              props.tx.status === 'complete' || props.depositCheck === 'pending'
+            }
+            complete={
+              props.tx.status === 'finalized' &&
+              props.depositCheck === 'success'
+            }
+            failed={props.depositCheck === 'fail'}
           >
             <p>{t('Confirm deposit')}</p>
+            {props.depositCheck === 'fail' ? (
+              <p className="text-sm text-intent-danger">
+                {t('The deposit failed')}
+              </p>
+            ) : (
+              <>
+                {props.depositCheck === 'success' &&
+                props.tx.status === 'finalized' ? (
+                  <p className="text-sm text-surface-0-fg-muted">
+                    {t('Deposit complete')}
+                  </p>
+                ) : props.depositCheck === 'pending' ||
+                  props.tx.status === 'complete' ||
+                  props.tx.status === 'finalized' ? (
+                  <p className="text-sm text-surface-0-fg-muted">
+                    {t('This may take several minutes')}
+                  </p>
+                ) : null}
+              </>
+            )}
           </FeedbackStep>
           <FeedbackStep
             pending={
               props.orderTx?.status === 'Requested' ||
-              props.orderTx?.status === 'Pending'
+              props.orderTx?.status === 'Pending' ||
+              props.orderCheck === 'pending'
             }
-            complete={props.orderTx?.status === 'Confirmed'}
+            complete={
+              props.orderTx?.status === 'Confirmed' &&
+              props.orderCheck === 'success'
+            }
+            failed={props.orderCheck === 'fail'}
           >
             <p>{t('Approve spot order')}</p>
-            {props.orderTx?.status === 'Requested' && (
-              <p className="text-surface-0-fg-muted">
-                {t('Confirm in wallet')}
+            {props.orderCheck === 'fail' ? (
+              <p className="text-sm text-intent-warning">
+                <Trans
+                  i18nKey="The spot market order might not have worked, <0>click here</0> to check on Console"
+                  components={[
+                    <Link
+                      key="link"
+                      to={Links.PORTFOLIO()}
+                      className="underline underline-offset-4"
+                    >
+                      click here
+                    </Link>,
+                  ]}
+                />
               </p>
-            )}
-            {props.orderTx?.status === 'Confirmed' && (
-              <p className="text-surface-0-fg-muted">
-                {t('Spot order confirmed')}
-              </p>
+            ) : (
+              <>
+                {props.orderTx?.status === 'Requested' && (
+                  <p className="text-surface-0-fg-muted text-sm">
+                    {t('Confirm in wallet...')}
+                  </p>
+                )}
+                {props.orderTx?.status === 'Confirmed' &&
+                  props.orderCheck === 'success' && (
+                    <p className="text-surface-0-fg-muted text-sm">
+                      {t('Spot order confirmed')}
+                    </p>
+                  )}
+              </>
             )}
           </FeedbackStep>
         </div>
@@ -167,6 +232,8 @@ type SquidFeedbackDialogProps = {
   asks?: Array<{ price: string; volume: string; numberOfOrders: string }>;
   onChange: (open: boolean) => void;
   estimatedAmount: string;
+  swapCheck: OrderCheck;
+  orderCheck: OrderCheck;
 };
 
 export const SquidFeedbackDialog = (props: SquidFeedbackDialogProps) => {
@@ -183,6 +250,8 @@ export const SquidFeedbackDialog = (props: SquidFeedbackDialogProps) => {
           orderTx={props.orderTx}
           asks={props.asks}
           estimatedAmount={props.estimatedAmount}
+          swapCheck={props.swapCheck}
+          orderCheck={props.orderCheck}
         />
       )}
     </Dialog>
@@ -194,6 +263,8 @@ const SquidContent = (props: {
   orderTx?: ReturnType<typeof useSimpleTransaction>;
   asks?: Array<{ price: string; volume: string; numberOfOrders: string }>;
   estimatedAmount: string;
+  swapCheck: OrderCheck;
+  orderCheck: OrderCheck;
 }) => {
   const t = useT();
   const data = props.tx.data;
@@ -235,7 +306,7 @@ const SquidContent = (props: {
             {data.hash && (
               <a
                 href={`https://axelarscan.io/gmp/${data.hash}`}
-                className="underline underline-offset-4 flex items-center gap-1"
+                className="underline underline-offset-4 flex items-center gap-1 text-sm text-surface-0-fg-muted"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -245,35 +316,79 @@ const SquidContent = (props: {
             )}
           </FeedbackStep>
           <FeedbackStep
-            pending={Boolean(data.hash && !data.result)}
-            complete={Boolean(data.result)}
+            pending={
+              Boolean(data.hash && !data.result) ||
+              props.swapCheck === 'pending'
+            }
+            complete={Boolean(data.result) && props.swapCheck === 'success'}
+            failed={props.swapCheck === 'fail'}
           >
             <p>{t('Confirm deposit')}</p>
-            {props.tx.status === 'finalized' && data.receipt && (
-              <p className="text-surface-0-fg-muted">
-                {t(
-                  'Your tokens have been swapped and deposited to the network. It may take a few minutes for your funds to appear under your public key.'
-                )}
+            {Boolean(
+              (data.hash && !data.result) || props.swapCheck === 'pending'
+            ) && (
+              <p className="text-sm text-surface-0-fg-muted">
+                {t('This may take several minutes')}
               </p>
+            )}
+            {props.swapCheck === 'fail' ? (
+              <p className="text-sm text-intent-danger">
+                {t('The swap with squid router failed')}
+              </p>
+            ) : (
+              <>
+                {props.tx.status === 'finalized' &&
+                  data.receipt &&
+                  props.swapCheck === 'success' && (
+                    <p className="text-surface-0-fg-muted text-sm">
+                      {t('Deposit complete')}
+                    </p>
+                  )}
+              </>
             )}
           </FeedbackStep>
           <FeedbackStep
             pending={
               props.orderTx?.status === 'Requested' ||
-              props.orderTx?.status === 'Pending'
+              props.orderTx?.status === 'Pending' ||
+              props.orderCheck === 'pending'
             }
-            complete={props.orderTx?.status === 'Confirmed'}
+            complete={
+              props.orderTx?.status === 'Confirmed' &&
+              (props.orderCheck === 'fail' || props.orderCheck === 'success')
+            }
+            failed={props.orderCheck === 'fail'}
           >
             <p>{t('Approve spot order')}</p>
-            {props.orderTx?.status === 'Requested' && (
-              <p className="text-surface-0-fg-muted">
-                {t('Confirm in wallet')}
+            {props.orderCheck === 'fail' ? (
+              <p className="text-sm text-intent-warning">
+                <Trans
+                  i18nKey="The spot market order might not have worked, <0>click here</0> to check on Console"
+                  components={[
+                    <Link
+                      key="link"
+                      to={Links.PORTFOLIO()}
+                      className="underline underline-offset-4"
+                    >
+                      click here
+                    </Link>,
+                  ]}
+                />
               </p>
-            )}
-            {props.orderTx?.status === 'Confirmed' && (
-              <p className="text-surface-0-fg-muted">
-                {t('Spot order confirmed')}
-              </p>
+            ) : (
+              <>
+                {props.orderTx?.status === 'Requested' && (
+                  <p className="text-surface-0-fg-muted text-sm">
+                    {t('Confirm in wallet...')}
+                  </p>
+                )}
+                {props.orderTx?.status === 'Confirmed' &&
+                  props.orderCheck === 'success' && (
+                    <p className="text-surface-0-fg-muted text-sm">
+                      {t('Spot order confirmed')}
+                    </p>
+                  )}
+              </>
             )}
           </FeedbackStep>
         </div>
@@ -283,9 +398,9 @@ const SquidContent = (props: {
           {props.tx.error && (
             <>
               {isUserRejected(props.tx.error) ? (
-                <p>{t('User rejected the transaction')}</p>
+                <p className="text-sm">{t('User rejected the transaction')}</p>
               ) : (
-                <p className="break-all">{props.tx.error.message}</p>
+                <p className="break-all text-sm">{props.tx.error.message}</p>
               )}
             </>
           )}
@@ -296,9 +411,10 @@ const SquidContent = (props: {
 };
 
 const FeedbackStep = (props: {
+  children: ReactNode;
   pending: boolean;
   complete: boolean;
-  children: ReactNode;
+  failed?: boolean;
 }) => {
   return (
     <div className="flex items-center gap-4">
@@ -307,6 +423,8 @@ const FeedbackStep = (props: {
           <ConfirmedBadge />
         ) : props.pending ? (
           <PendingBadge />
+        ) : props.failed ? (
+          <FailedBadge />
         ) : (
           <DefaultBadge />
         )}
