@@ -129,7 +129,7 @@ const Stat = (props: { label: ReactNode; value: ReactNode }) => {
 
 const ActiveUsersStat = () => {
   const { data } = useSuspenseAccounts({
-    'filter.accountTypes': vegaAccountType.ACCOUNT_TYPE_GENERAL,
+    type: vegaAccountType.ACCOUNT_TYPE_GENERAL,
   });
 
   return <Stat label="Active users" value={data.length} />;

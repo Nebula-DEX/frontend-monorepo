@@ -16,7 +16,7 @@ const accountTypeSchema = z.nativeEnum(vegaAccountType);
 export type AccountType = z.infer<typeof accountTypeSchema>;
 
 const queryParamSchema = z.object({
-  partyId: z.string(),
+  partyId: z.string().optional(),
   type: accountTypeSchema.optional(),
   assetId: z.string().optional(),
 });
