@@ -189,6 +189,7 @@ export const singleRow: Position = {
   partyId: 'partyId',
   assetId: 'asset-id',
   assetSymbol: 'BTC',
+  notionalSymbol: 'USDT',
   averageEntryPrice: '133',
   currentLeverage: 1.1,
   assetDecimals: 2, // this is settlementAsset.decimals

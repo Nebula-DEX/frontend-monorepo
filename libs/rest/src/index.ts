@@ -1,7 +1,7 @@
 export * from './hooks';
 
 export {
-  AccountType,
+  type AccountType,
   queryKeys as accountsQueryKeys,
   accountsQueryOptions,
 } from './queries/accounts';
