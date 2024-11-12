@@ -19,7 +19,7 @@ export const SimpleRewardCard = (props: RewardCard) => {
   return (
     <div className="grid grid-rows-[subgrid] row-span-3 p-4 rounded-grid relative overflow-hidden bg-gradient-to-b from-surface-1/80 to-surface-1/60">
       <ColourfulBorder />
-      <RewardImage img={`/reward-${props.rewardId}.jpg`} />
+      <RewardImage img={`/reward-${props.rewardId}.png`} />
 
       {props.tags && props.tags.length > 0 && (
         <div className="flex flex-wrap items-start gap-2">
