@@ -14,6 +14,7 @@ import { useFallbackBuyForm } from './use-fallback-buy-form';
 import { getChainName } from '@vegaprotocol/web3';
 import { APP_SYMBOL } from 'apps/trading/lib/constants';
 import { NonSwapInfo } from './swap-info';
+import { type Market } from '@vegaprotocol/rest';
 
 export const FallbackBuyForm = (props: {
   assets: Array<AssetERC20>;
@@ -21,10 +22,7 @@ export const FallbackBuyForm = (props: {
   configs: Configs;
   minAmount?: string;
   asks?: Array<{ price: string; volume: string; numberOfOrders: string }>;
-  market: {
-    decimalPlaces: number;
-    positionDecimalPlaces: number;
-  };
+  market: Market;
 }) => {
   const { pubKeys } = useVegaWallet();
   const {
