@@ -41,12 +41,15 @@ const ClaimContainer = (props: { pubKey: string }) => {
   });
   const mutationSend = useMutation({
     mutationFn: async (hash: string) => {
-      // TODO:
-      // - get full url for claim endpoint and make request
-      const endpoint = `/claim/${props.pubKey}/${hash}`;
-      // eslint-disable-next-line no-console
-      console.log('GET', endpoint);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const endpoint = `https://airdrop-api.neb.exchange/claim/${props.pubKey}/${hash}`;
+      const res = await fetch(endpoint);
+      const json = await res.json();
+
+      if (json.success) {
+        return json;
+      } else {
+        throw new Error(json.error);
+      }
     },
   });
 

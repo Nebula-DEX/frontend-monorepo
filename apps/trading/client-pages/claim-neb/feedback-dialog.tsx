@@ -13,7 +13,7 @@ import type { UseSignMessageReturnType } from 'wagmi';
 
 type FeedbackDialogProps = {
   mutationSign: UseSignMessageReturnType<unknown>;
-  mutationSend: UseMutationResult<void, Error, string, unknown>;
+  mutationSend: UseMutationResult<unknown, Error, string, unknown>;
 };
 
 export const FeedbackDialog = (props: FeedbackDialogProps) => {
@@ -35,11 +35,13 @@ export const FeedbackDialog = (props: FeedbackDialogProps) => {
               </p>
             )}
             {props.mutationSign.isSuccess && (
-              <p className="text-sm text-surface-0-fg-muted">Message signed</p>
+              <p className="text-sm text-surface-0-fg-muted">
+                {t('Message signed')}
+              </p>
             )}
             {props.mutationSign.isPending && (
               <p className="text-sm text-surface-0-fg-muted">
-                Approve in wallet
+                {t('Confirm in wallet...')}
               </p>
             )}
           </FeedbackStep>
@@ -50,7 +52,7 @@ export const FeedbackDialog = (props: FeedbackDialogProps) => {
           >
             <p>{t('Claim')}</p>
             {props.mutationSend.isError && (
-              <p className="text-sm text-intent-danger">
+              <p className="text-sm text-intent-danger first-letter:capitalize">
                 {props.mutationSend.error.message}
               </p>
             )}
@@ -63,7 +65,7 @@ export const FeedbackDialog = (props: FeedbackDialogProps) => {
             {props.mutationSend.isSuccess && (
               <p className="text-sm text-green-550">
                 {t(
-                  'Claim request complete. It may take several minutes to credit your account.'
+                  'Claim request complete. It can take up to 24 hours to credit your account.'
                 )}
               </p>
             )}
