@@ -5,7 +5,6 @@ import { Time } from '../utils';
 const rewardCardSchema = z.object({
   rewardId: z.string(),
   title: z.string(),
-  img: z.string(),
   description: z.string(),
   tags: z.array(
     z.object({
@@ -39,37 +38,36 @@ export function rewardCardsOptions() {
 
 // Add reward card data here
 const data: RewardCard[] = [
-  /*
   {
     rewardId:
-      '82456b68780b36dcdfcda3fb70dbfd81dc1a81f20175ff5d9de13e56f8478b51',
-    title: 'Reward A',
-    img: '',
+      'e79dedd2d05af4dd5fb5039966f81c56ce65d4451a2c02e071017cb419b45b8a',
+    title: ' Crypto Constellation Reward',
     description:
-      'AAA This is a description that returns onto a maximum number of lines to be defined. It may also be truncated at 3 or 4 lines.\n\n* **1,666.58 NEB**\n* Distribution strategy: Pro rata \n* Reward pool amount and asset\n* Another bullet point\n* Another bullet point',
-    tags: [
-      { text: 'best reward ever', variant: 'primary' },
-      { text: 'another', variant: 'secondary' },
-      { text: 'foo', variant: 'tertiary' },
-    ],
+      'Venture into the vast expanse of digital assets with the Crypto Constellation Reward! Every 4 hours, traders with realized gains or losses on BTC, ETH, and SOL can enter the cosmic lottery, where higher PNL boosts your chances of winning the first prize.\n\n* **Only realized PNL within the 4-hour epoch qualifies you for the draw.**\n* **Must be part of a team to qualify.**',
+    tags: [],
   },
   {
     rewardId:
-      'a067c9f3f0d0e8e032050e84893c909fb6140e00fb7145d81fe6786d3efe7854',
-    title: 'Reward B',
-    img: '',
+      '6efc14af801568bbfb786f9bf765e4773c7c528ea7393e9f89b61b029b8bd30f',
+    title: 'Stellar Commodities Quest',
     description:
-      'BBB This is a *description* that returns onto a maximum number of lines to be defined. It may also be truncated at 3 or 4 lines.\n\n* **1,666.58 NEB**\n* Distribution strategy: Pro rata \n* Reward pool amount and asset\n* Another bullet point\n* Another bullet point',
-    tags: [{ text: 'best reward ever', variant: 'primary' }],
+      'Explore the universe of essential resources in the Stellar Commodities Quest. Trade Gold, Oil, Wheat, and more to build your PNL, and join the 4-hourly lottery where every trader has a chance to shine. Higher PNL increases your odds of winning the lottery.\n\n* **Only realized PNL within the 4-hour epoch qualifies you for the draw.** \n* **Must be part of a team to qualify.**',
+    tags: [],
   },
   {
     rewardId:
-      '9584bc79fd8b6db70df612c957a495fa0ca30a49c9be2d09c045ae5a4653d892',
-    title: 'Reward C',
-    img: '',
+      'f836f4e39f58c955dc87a7cd5cbc73d722b06bda2064066621f11f00b59bef02',
+    title: 'Galactic Forex Challenge',
     description:
-      'CCC This is a description that returns onto a maximum number of lines to be defined. It may also be truncated at 3 or 4 lines.\n\n* **1,666.58 NEB**\n* Distribution strategy: Pro rata \n* Reward pool amount and asset',
-    tags: [{ text: 'best reward ever', variant: 'secondary' }],
+      'Navigate the FX landscape with the Galactic Forex Challenge. Engage with currencies like Euro, GBP, Yen, Yuan, and USD. Every 4 hours, traders in the FX galaxy join a cosmic lottery, and higher PNL increases your odds of winning the lottery.\n\n* **Only realized PNL within the 4-hour epoch qualifies you for the draw.** \n* **Must be part of a team to qualify.**',
+    tags: [],
   },
-  */
+  {
+    rewardId:
+      '44d49b3f3b0d19cec1b4083608eddcbd33f574eb38de521f149adb4bd3ce8730',
+    title: 'Interstellar Index League',
+    description:
+      'Expand your reach across global markets in the Interstellar Index League. From the DAX to the Nikkei, FTSE, and beyond, trade your way to higher PNL and join a 4-hourly draw for the ultimate prize. Higher PNL increases your odds of winning the lottery.\n\n* **Only realized PNL within the 4-hour epoch qualifies you for the draw.** \n* **Must be part of a team to qualify.**',
+    tags: [],
+  },
 ];
