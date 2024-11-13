@@ -5,20 +5,24 @@ import type {
   VegaValueFormatterParams,
   VegaValueGetterParams,
 } from '@vegaprotocol/datagrid';
-import { MarketProductPill, StackedCell } from '@vegaprotocol/datagrid';
+import {
+  MarketProductPill,
+  signedNumberCssClass,
+  StackedCell,
+} from '@vegaprotocol/datagrid';
 import {
   addDecimalsFormatNumber,
   formatNumber,
+  formatNumberPercentage,
   priceChangePercentage,
   toBigNum,
 } from '@vegaprotocol/utils';
-import { Sparkline, Tooltip } from '@vegaprotocol/ui-toolkit';
+import { Arrow, cn, Sparkline, Tooltip } from '@vegaprotocol/ui-toolkit';
 import type {
   MarketMaybeWithData,
   MarketMaybeWithDataAndCandles,
 } from '@vegaprotocol/markets';
 import {
-  Last24hPriceChange,
   calcCandleVolume,
   calcCandleVolumePrice,
   getAsset,
@@ -29,6 +33,8 @@ import {
 import { useT } from '../../lib/use-t';
 import { Emblem } from '@vegaprotocol/emblem';
 import { MarketIcon, getMarketStateTooltip } from './market-icon';
+import { useCandleData } from '@vegaprotocol/rest';
+import BigNumber from 'bignumber.js';
 
 const openInterestValues = (data: MarketMaybeWithData) => {
   if (!data) return null;
@@ -88,47 +94,6 @@ const getOpenInterestCellUnits = (
 
   // Spot markets have no explicit settlement asset, so we use the quote instead
   return getQuoteName(data);
-};
-
-export const priceChangeRenderer = (
-  data: MarketMaybeWithDataAndCandles | undefined,
-  showChangeValue = true
-) => {
-  if (!data) return null;
-  return (
-    <Last24hPriceChange
-      marketId={data.id}
-      decimalPlaces={data.decimalPlaces}
-      orientation="vertical"
-      showChangeValue={showChangeValue}
-      fallback={
-        <span className="leading-4">
-          <div className="text-ellipsis whitespace-nowrap overflow-hidden">
-            <span data-testid="price-change-percentage">{'0.00%'}</span>
-          </div>
-          {showChangeValue && (
-            <span
-              data-testid="price-change"
-              className="text-ellipsis whitespace-nowrap overflow-hidden text-surface-1-fg-muted text-xs"
-            >
-              ({'0.00'})
-            </span>
-          )}
-        </span>
-      }
-    />
-  );
-};
-
-export const priceChangeSparklineRenderer = (
-  data: MarketMaybeWithDataAndCandles | undefined
-) => {
-  if (!data) return null;
-  const candles = data.candles
-    ?.filter((c) => c.close)
-    .map((c) => Number(c.close));
-  if (!candles?.length) return null;
-  return <Sparkline width={80} height={20} data={candles || [0]} />;
 };
 
 export const priceValueFormatter = (
@@ -240,12 +205,8 @@ export const useMarketsColumnDefs = () => {
         cellRenderer: ({
           data,
         }: ValueFormatterParams<MarketMaybeWithDataAndCandles, 'candles'>) => {
-          return (
-            <div className="flex gap-2 justify-end">
-              <span>{priceChangeSparklineRenderer(data)}</span>
-              <span>{priceChangeRenderer(data)}</span>
-            </div>
-          );
+          if (!data) return '-';
+          return <PriceChangeCell data={data} />;
         },
         valueGetter: ({
           data,
@@ -357,4 +318,29 @@ const isSpotMarket = (
 ) => {
   const product = market?.tradableInstrument?.instrument?.product;
   return product && isSpot(product);
+};
+
+const PriceChangeCell = (props: { data: MarketMaybeWithData }) => {
+  const { sparkline, priceChange, pctChange } = useCandleData(props.data.id);
+  return (
+    <div className="flex gap-2 items-center justify-end">
+      <span>
+        {sparkline && <Sparkline data={sparkline} width={76} height={20} />}
+      </span>
+      <span className={cn('leading-4', signedNumberCssClass(pctChange || 0))}>
+        <span className="flex items-center justify-end gap-1 text-ellipsis whitespace-nowrap overflow-hidden">
+          <Arrow value={pctChange || 0} />
+          <span data-testid="price-change-percentage">
+            {formatNumberPercentage(BigNumber(pctChange || 0), 2)}
+          </span>
+        </span>
+        <span
+          data-testid="price-change"
+          className="text-ellipsis whitespace-nowrap overflow-hidden text-surface-0-fg-muted text-xs"
+        >
+          ({formatNumber(priceChange || 0, 3)})
+        </span>
+      </span>
+    </div>
+  );
 };

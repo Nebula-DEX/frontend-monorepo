@@ -3,9 +3,25 @@ import { z } from 'zod';
 import { Time } from '../utils/datetime';
 import { queryOptions } from '@tanstack/react-query';
 
+/** Interval tme in seconds */
+const intervalSchema = z.enum([
+  '60', // 1m
+  '300', // 5m
+  '900', // 15m
+  '1800', // 30m
+  '3600', // 1H
+  '14400', // 4H
+  '21600', // 6H
+  '28800', // 8H
+  '43200', // 12H
+  '86400', // 1D
+  '604800', // 7D
+]);
+export type IntervalV2 = z.infer<typeof intervalSchema>;
+
 const parametersSchema = z.object({
   marketId: z.string(),
-  interval: z.string(),
+  interval: intervalSchema,
   fromTimestamp: z.string(),
   toTimestamp: z.string().optional(),
 });
@@ -26,13 +42,13 @@ const candleSchema = z.object({
   volume: z.number().default(0),
 });
 
-export type Candle = z.infer<typeof candleSchema>;
+export type CandleV2 = z.infer<typeof candleSchema>;
 
 const candlesSchema = z.array(candleSchema);
 
 export function candleDataQueryOptionsV2(params: {
   marketId: string;
-  interval: string;
+  interval: IntervalV2;
   fromTimestamp: string;
   toTimestamp?: string;
 }) {
@@ -47,7 +63,7 @@ export function candleDataQueryOptionsV2(params: {
 // Options for when polling candles for TV. Never cached as its passed directly to the chart.
 export function candleDataPollOptionsV2(params: {
   marketId: string;
-  interval: string;
+  interval: IntervalV2;
   fromTimestamp: string;
   toTimestamp?: string;
 }) {
