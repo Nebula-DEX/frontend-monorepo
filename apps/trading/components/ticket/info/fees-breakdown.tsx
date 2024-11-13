@@ -25,6 +25,7 @@ const FeesBreakdownItem = ({
 
 export const FeesBreakdown = ({
   estimate,
+  decimals,
 }: {
   estimate: ReturnType<typeof useEstimateFees>;
   decimals: number;
@@ -35,20 +36,25 @@ export const FeesBreakdown = ({
     <dl className="grid grid-cols-2">
       <FeesBreakdownItem
         label={t('Fee')}
-        value={addDecimalsFormatNumber(estimate.fee.toString(), 2)}
+        value={addDecimalsFormatNumber(estimate.fee.toString(), decimals, 2)}
         testId="fee"
       />
       <FeesBreakdownItem
         label={t('Discount')}
         value={`${addDecimalsFormatNumber(
           estimate.discount.toString(),
+          decimals,
           2
         )} (${formatNumberPercentage(estimate.discountPct, 2)})`}
         testId="fee-discount"
       />
       <FeesBreakdownItem
         label={t('Discounted fee')}
-        value={addDecimalsFormatNumber(estimate.feeDiscounted.toString(), 2)}
+        value={addDecimalsFormatNumber(
+          estimate.feeDiscounted.toString(),
+          decimals,
+          2
+        )}
         testId="discounted-fee"
       />
     </dl>
