@@ -208,7 +208,7 @@ export const CompetitionsGame = () => {
             <div className="flex justify-between items-center border-b border-gs-300 dark:border-gs-700">
               <TabsList>
                 <TabsTrigger value="scores">{t('Live scores')}</TabsTrigger>
-                <TabsTrigger value="history">{t('Score history')}</TabsTrigger>
+                {/* <TabsTrigger value="history">{t('Score history')}</TabsTrigger> */}
                 {isRankPayout && (
                   <TabsTrigger value="payout-structure">
                     {t('Payout structure')}
