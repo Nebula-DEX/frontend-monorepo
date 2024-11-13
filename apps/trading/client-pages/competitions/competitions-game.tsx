@@ -208,7 +208,7 @@ export const CompetitionsGame = () => {
             <div className="flex justify-between items-center border-b border-gs-300 dark:border-gs-700">
               <TabsList>
                 <TabsTrigger value="scores">{t('Live scores')}</TabsTrigger>
-                <TabsTrigger value="history">{t('Score history')}</TabsTrigger>
+                {/* <TabsTrigger value="history">{t('Score history')}</TabsTrigger> */}
                 {isRankPayout && (
                   <TabsTrigger value="payout-structure">
                     {t('Payout structure')}
@@ -528,7 +528,7 @@ const LiveScoresTable = ({
           <span>{team.name}</span>
         </Link>
       ),
-      score: formatNumber(teamScore.score, 2),
+      score: addDecimalsFormatNumber(teamScore.score, asset.decimals, 2),
       estimatedRewards:
         distributionStrategy ===
         DistributionStrategy.DISTRIBUTION_STRATEGY_RANK_LOTTERY
