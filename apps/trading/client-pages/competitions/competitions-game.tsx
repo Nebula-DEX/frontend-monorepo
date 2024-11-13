@@ -528,7 +528,7 @@ const LiveScoresTable = ({
           <span>{team.name}</span>
         </Link>
       ),
-      score: formatNumber(teamScore.score, 2),
+      score: addDecimalsFormatNumber(teamScore.score, asset.decimals, 2),
       estimatedRewards:
         distributionStrategy ===
         DistributionStrategy.DISTRIBUTION_STRATEGY_RANK_LOTTERY
