@@ -9,7 +9,7 @@
     "read-write-mutexify": "^2.1.0",
     "nanoassert": "^2.0.0",
     "uuid": "^8.3.2",
-    "@vegaprotocol/protos": "^0.21.0"
+    "@vegaprotocol/protos": "^0.26.0"
   },
   "type": "module",
   "main": "./src/index.js",
