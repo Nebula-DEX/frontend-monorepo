@@ -1,11 +1,11 @@
 import { useT } from '../../lib/use-t';
-import { ExternalLink /*, Loader */ } from '@vegaprotocol/ui-toolkit';
+import { ExternalLink, Loader } from '@vegaprotocol/ui-toolkit';
 import { Link } from 'react-router-dom';
 import { Links } from '../../lib/links';
 import { CompetitionsActions } from '../../components/competitions/competitions-cta';
-// import { CompetitionsLeaderboard } from '../../components/competitions/competitions-leaderboard';
-// import { useTeams } from '../../lib/hooks/use-teams';
-// import take from 'lodash/take';
+import { CompetitionsLeaderboard } from '../../components/competitions/competitions-leaderboard';
+import { useTeams } from '../../lib/hooks/use-teams';
+import take from 'lodash/take';
 import { usePageTitle } from '../../lib/hooks/use-page-title';
 import { TeamCard } from '../../components/competitions/team-card';
 import { useMyTeam } from '../../lib/hooks/use-my-team';
@@ -19,7 +19,7 @@ import { SimpleRewardCardsContainer } from '../../components/rewards-container/s
 export const CompetitionsHome = () => {
   const t = useT();
   usePageTitle(t('Competitions'));
-  // const { data: teamsData, loading: teamsLoading } = useTeams();
+  const { data: teamsData, loading: teamsLoading } = useTeams();
 
   const {
     team: myTeam,
@@ -90,7 +90,7 @@ export const CompetitionsHome = () => {
       <SimpleRewardCardsContainer />
 
       {/** The teams ranking */}
-      {/* <section>
+      <section>
         <div className="mb-1 flex flex-row items-baseline gap-3 justify-between">
           <h2 className="text-2xl">
             <Link to={Links.COMPETITIONS_TEAMS()} className=" underline">
@@ -114,7 +114,7 @@ export const CompetitionsHome = () => {
             <CompetitionsLeaderboard data={take(teamsData, 10)} />
           )}
         </div>
-      </section> */}
+      </section>
     </ErrorBoundary>
   );
 };
