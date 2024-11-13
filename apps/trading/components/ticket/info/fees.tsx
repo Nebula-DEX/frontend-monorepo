@@ -71,11 +71,19 @@ export const Fees = ({ oco = false }: { oco?: boolean }) => {
       }
       value={
         estimate.fee ? (
-          <Tooltip description={`~${formatValue(estimate.fee.toString(), 2)}`}>
+          <Tooltip
+            description={`~${formatValue(
+              estimate.fee.toString(),
+              asset.decimals,
+              asset.quantum,
+              2
+            )}`}
+          >
             <span>{`~${formatValue(
               estimate.fee.toString(),
-              2,
-              asset.quantum
+              asset.decimals,
+              asset.quantum,
+              2
             )}`}</span>
           </Tooltip>
         ) : (
