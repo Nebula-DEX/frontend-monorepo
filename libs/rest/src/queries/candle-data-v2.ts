@@ -88,7 +88,10 @@ export async function retrieveCandleDataV2(params: QueryParams) {
 
   const result = await axios.get(url.href);
 
-  return candlesSchema.parse(result.data);
+  return candlesSchema.parse(
+    // API returns candles with newest first but charting purposes we want oldest first
+    result.data.reverse()
+  );
 }
 
 export const queryKeys = {

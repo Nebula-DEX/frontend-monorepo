@@ -184,8 +184,7 @@ export const useDatafeedV2 = (marketId: string) => {
               open: d.open,
               close: d.close,
               volume: d.volume,
-            }))
-            .reverse();
+            }));
 
           hasHistory.current = true;
 
