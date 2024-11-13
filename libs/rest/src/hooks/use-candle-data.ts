@@ -16,7 +16,6 @@ export function useCandleData(marketId: string) {
 
   return {
     ...queryResult,
-    // notional,
     volume,
     sparkline,
     priceChange,

@@ -15,6 +15,7 @@ import { useT } from '../../lib/use-t';
 import { Emblem } from '@vegaprotocol/emblem';
 import { MarketIcon } from '../../client-pages/markets/market-icon';
 import { MarketProductPill } from '@vegaprotocol/datagrid';
+import { useCandleData } from '@vegaprotocol/rest';
 
 export const MarketSelectorItem = ({
   market,
@@ -66,6 +67,7 @@ const MarketData = ({ market }: { market: MarketMaybeWithDataAndCandles }) => {
     : '-';
 
   const { oneDayCandles } = useCandles({ marketId: market.id });
+  const { sparkline } = useCandleData(market.id);
 
   const vol = oneDayCandles ? calcCandleVolume(oneDayCandles) : '0';
   const volume =
@@ -105,13 +107,7 @@ const MarketData = ({ market }: { market: MarketMaybeWithDataAndCandles }) => {
         {volume}
       </div>
       <div className="hidden col-span-2 sm:flex justify-end" role="gridcell">
-        {oneDayCandles && (
-          <Sparkline
-            width={64}
-            height={15}
-            data={oneDayCandles.map((c) => Number(c.close))}
-          />
-        )}
+        {sparkline && <Sparkline width={64} height={15} data={sparkline} />}
       </div>
     </>
   );
