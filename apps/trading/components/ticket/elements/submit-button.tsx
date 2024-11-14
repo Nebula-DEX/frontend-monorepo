@@ -1,15 +1,12 @@
-import {
-  Button,
-  cn,
-  Intent,
-  VegaIcon,
-  VegaIconNames,
-} from '@vegaprotocol/ui-toolkit';
+import { Button, cn, Intent } from '@vegaprotocol/ui-toolkit';
 import { Side } from '@vegaprotocol/types';
 import { useForm } from '../use-form';
-import { useDialogStore, useWallet } from '@vegaprotocol/wallet-react';
+import {
+  useDialogStore,
+  useVegaWallet,
+  useWallet,
+} from '@vegaprotocol/wallet-react';
 import { useT } from '../../../lib/use-t';
-import { useFundsAvailable } from '../../../lib/hooks/use-funds-available';
 import { useTicketContext } from '../ticket-context';
 import {
   SidebarAccountsViewType,
@@ -17,10 +14,9 @@ import {
   useSidebarAccountsInnerView,
   ViewType,
 } from 'apps/trading/lib/hooks/use-sidebar';
-import { toBigNum } from '@vegaprotocol/utils';
-import BigNumber from 'bignumber.js';
 import { type ReactNode } from 'react';
 import omit from 'lodash/omit';
+import { useOpenVolume } from '@vegaprotocol/positions';
 
 type SubmitButtonProps = {
   type: 'button' | 'submit';
@@ -32,6 +28,10 @@ type SubmitButtonProps = {
 
 export const SubmitButton = ({ text }: { text: string }) => {
   const t = useT();
+  const ticket = useTicketContext();
+  const form = useForm();
+  const side = form.watch('side');
+  const needsDeposit = useIsDepositRequired();
 
   const connected = useWallet(
     (store) => store.status === 'connected' && store.current !== 'viewParty'
@@ -48,22 +48,12 @@ export const SubmitButton = ({ text }: { text: string }) => {
     setSidebarInnerView([SidebarAccountsViewType.Deposit, assetId]);
   };
 
-  const { fundsAvailable, loading: fundsLoading } = useFundsAvailable();
-  const ticket = useTicketContext();
-
-  const form = useForm();
-  const side = form.watch('side');
-
   const asset =
     ticket.type === 'default'
       ? ticket.settlementAsset
       : side === Side.SIDE_BUY
       ? ticket.quoteAsset // buying with quote
       : ticket.baseAsset; // selling with base
-
-  const funds = fundsAvailable?.find((f) => f.asset.id === asset.id);
-  const amount = funds ? toBigNum(funds.balance, asset.decimals) : BigNumber(0);
-  const needsDeposit = !fundsLoading && amount.isZero();
 
   let p: SubmitButtonProps = {
     type: 'button',
@@ -84,26 +74,6 @@ export const SubmitButton = ({ text }: { text: string }) => {
         {t('Connect')}
       </Button>
     );
-  } else if (fundsLoading) {
-    p = {
-      type: 'button',
-      side,
-      disabled: true,
-      onClick: undefined,
-      children: (
-        <div
-          className={cn(
-            'absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2'
-          )}
-        >
-          <VegaIcon
-            size={18}
-            name={VegaIconNames.LOADING}
-            className="animate-spin text-white"
-          />
-        </div>
-      ),
-    };
   } else if (needsDeposit) {
     return (
       <Button
@@ -146,4 +116,32 @@ export const SubmitButton = ({ text }: { text: string }) => {
       {p.children}
     </button>
   );
+};
+
+/**
+ * Returns bool indicating if a deposit is required to trade.
+ * User with no position and 0 balance in the required general account
+ * will result in this function returning true
+ */
+const useIsDepositRequired = () => {
+  const ticket = useTicketContext();
+  const form = useForm();
+  const { pubKey } = useVegaWallet();
+  const openVolumeQuery = useOpenVolume(pubKey, ticket.market.id);
+  const side = form.watch('side');
+  const noPosition = openVolumeQuery?.openVolume === '0';
+
+  if (ticket.type === 'default') {
+    return noPosition && ticket.accounts.general === '0';
+  }
+
+  // Spot market. If buying will need balance in the quote account, if selling
+  // will need balance in base account
+  if (side === Side.SIDE_BUY) {
+    return noPosition && ticket.accounts.quote === '0';
+  } else {
+    return noPosition && ticket.accounts.base === '0';
+  }
+
+  return false;
 };
