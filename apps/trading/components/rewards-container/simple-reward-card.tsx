@@ -13,6 +13,7 @@ import { ColourfulBorder } from '@vegaprotocol/ui-toolkit';
 import { Links } from 'apps/trading/lib/links';
 import { type RewardCard } from '@vegaprotocol/rest';
 import { useState } from 'react';
+import { formatNumber } from '@vegaprotocol/utils';
 
 export const SimpleRewardCard = (props: RewardCard) => {
   const t = useT();
@@ -40,6 +41,11 @@ export const SimpleRewardCard = (props: RewardCard) => {
 
       <div className="flex flex-col gap-2">
         <h3 className="text-3xl leading-none">{props.title}</h3>
+        <h4 className="to-highlight-tertiary-fg text-4xl">
+          <GradientText>
+            {formatNumber(props.prizePool, 2)} <span className="calt">NEB</span>
+          </GradientText>
+        </h4>
 
         <div className="flex flex-col gap-4 text-surface-1-fg-muted">
           <ReactMarkdown
