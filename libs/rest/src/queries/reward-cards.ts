@@ -12,6 +12,7 @@ const rewardCardSchema = z.object({
       variant: z.enum(['primary', 'secondary', 'tertiary']),
     })
   ),
+  prizePool: z.number(),
 });
 
 const rewardCardsSchema = z.array(rewardCardSchema);
@@ -45,6 +46,7 @@ const data: RewardCard[] = [
     description:
       'Venture into the vast expanse of digital assets with the Crypto Constellation Reward! Every 4 hours, traders with realized gains or losses on BTC, ETH, and SOL can enter the cosmic lottery, where higher PNL boosts your chances of winning the first prize.\n\n* **Only realized PNL within the 4-hour epoch qualifies you for the draw.**\n* **Must be part of a team to qualify.**',
     tags: [],
+    prizePool: 41500,
   },
   {
     rewardId:
@@ -53,6 +55,7 @@ const data: RewardCard[] = [
     description:
       'Explore the universe of essential resources in the Stellar Commodities Quest. Trade Gold, Oil, Wheat, and more to build your PNL, and join the 4-hourly lottery where every trader has a chance to shine. Higher PNL increases your odds of winning the lottery.\n\n* **Only realized PNL within the 4-hour epoch qualifies you for the draw.** \n* **Must be part of a team to qualify.**',
     tags: [],
+    prizePool: 41500,
   },
   {
     rewardId:
@@ -61,6 +64,7 @@ const data: RewardCard[] = [
     description:
       'Navigate the FX landscape with the Galactic Forex Challenge. Engage with currencies like Euro, GBP, Yen, Yuan, and USD. Every 4 hours, traders in the FX galaxy join a cosmic lottery, and higher PNL increases your odds of winning the lottery.\n\n* **Only realized PNL within the 4-hour epoch qualifies you for the draw.** \n* **Must be part of a team to qualify.**',
     tags: [],
+    prizePool: 41500,
   },
   {
     rewardId:
@@ -69,5 +73,6 @@ const data: RewardCard[] = [
     description:
       'Expand your reach across global markets in the Interstellar Index League. From the DAX to the Nikkei, FTSE, and beyond, trade your way to higher PNL and join a 4-hourly draw for the ultimate prize. Higher PNL increases your odds of winning the lottery.\n\n* **Only realized PNL within the 4-hour epoch qualifies you for the draw.** \n* **Must be part of a team to qualify.**',
     tags: [],
+    prizePool: 41500,
   },
 ];
