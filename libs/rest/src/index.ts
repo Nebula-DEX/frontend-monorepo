@@ -12,7 +12,8 @@ export { Interval } from './queries/candle-intervals';
 export {
   candleDataQueryOptionsV2,
   candleDataPollOptionsV2,
-  type Candle,
+  type CandleV2,
+  type IntervalV2,
 } from './queries/candle-data-v2';
 export { type RewardCard } from './queries/reward-cards';
 export { useTrades } from './hooks/use-trades';

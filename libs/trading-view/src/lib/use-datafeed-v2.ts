@@ -12,6 +12,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
   candleDataPollOptionsV2,
   candleDataQueryOptionsV2,
+  type IntervalV2,
   marketOptions,
 } from '@vegaprotocol/rest';
 import { TRADINGVIEW_SESSION_CONFIG } from './constants';
@@ -32,7 +33,7 @@ const resolutionMap: Record<string, Interval> = {
   '1W': Interval.INTERVAL_I7D,
 } as const;
 
-const resolutionSecMap: Record<string, string> = {
+const resolutionSecMap: Record<string, IntervalV2> = {
   '1': '60',
   '5': '300',
   '15': '900',
@@ -183,8 +184,7 @@ export const useDatafeedV2 = (marketId: string) => {
               open: d.open,
               close: d.close,
               volume: d.volume,
-            }))
-            .reverse();
+            }));
 
           hasHistory.current = true;
 

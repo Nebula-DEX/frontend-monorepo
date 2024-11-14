@@ -1,9 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { candleDataQueryOptionsV2 } from '../queries/candle-data-v2';
+import {
+  candleDataQueryOptionsV2,
+  type IntervalV2,
+} from '../queries/candle-data-v2';
 
 export function useCandlesV2(
   marketId: string,
-  interval: string,
+  interval: IntervalV2,
   fromTimestamp: string,
   toTimestamp?: string
 ) {

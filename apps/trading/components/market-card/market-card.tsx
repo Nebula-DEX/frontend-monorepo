@@ -36,14 +36,14 @@ export const MarketCard = ({ marketId }: { marketId: string }) => {
           {priceChange && (
             <p
               className={cn('text-sm flex items-center justify-end gap-1', {
-                'text-dir-up-fg': priceChange?.isPositive(),
-                'text-dir-down-fg': priceChange?.isNegative(),
+                'text-dir-up-fg': priceChange > 0,
+                'text-dir-down-fg': priceChange < 0,
               })}
             >
               <VegaIcon
                 size={10}
                 name={
-                  priceChange?.isPositive()
+                  priceChange > 0
                     ? VegaIconNames.CHEVRON_UP
                     : VegaIconNames.CHEVRON_DOWN
                 }
