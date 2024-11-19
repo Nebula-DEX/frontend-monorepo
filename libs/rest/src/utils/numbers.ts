@@ -75,7 +75,7 @@ export class Decimal {
  * browser/os setting
  */
 function getUserLocale() {
-  return 'default';
+  return undefined;
 }
 
 /**
@@ -90,17 +90,9 @@ function getFormat() {
   const decimal = parts.find((p) => p.type === 'decimal');
   const group = parts.find((p) => p.type === 'group');
 
-  if (!decimal) {
-    throw new Error('could not get decimal separator');
-  }
-
-  if (!group) {
-    throw new Error('could not get group separator');
-  }
-
   return {
-    decimalSeparator: decimal.value,
-    groupSeparator: group.value,
+    decimalSeparator: decimal ? decimal.value : '.',
+    groupSeparator: group ? group.value : ',',
     groupSize: 3,
   };
 }
