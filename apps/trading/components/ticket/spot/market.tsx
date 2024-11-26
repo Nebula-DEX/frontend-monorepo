@@ -40,7 +40,7 @@ export const Market = (props: FormProps) => {
     resolver: zodResolver(schema),
     defaultValues: {
       ticketType: 'market',
-      sizeMode: 'contracts',
+      sizeMode: 'notional',
       type: OrderType.TYPE_MARKET,
       side: props.side,
       timeInForce: OrderTimeInForce.TIME_IN_FORCE_IOC,

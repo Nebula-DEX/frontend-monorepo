@@ -48,7 +48,7 @@ export const StopLimit = (props: FormProps) => {
     defaultValues: {
       ticketType: 'stopLimit',
       type: OrderType.TYPE_LIMIT,
-      sizeMode: 'contracts',
+      sizeMode: 'notional',
       side: props.side,
       triggerDirection: StopOrderTriggerDirection.TRIGGER_DIRECTION_RISES_ABOVE,
       triggerType: 'price',

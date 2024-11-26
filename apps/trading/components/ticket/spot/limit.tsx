@@ -40,7 +40,7 @@ export const Limit = (props: FormProps) => {
     resolver: zodResolver(schema),
     defaultValues: {
       ticketType: 'limit',
-      sizeMode: 'contracts',
+      sizeMode: 'notional',
       type: OrderType.TYPE_LIMIT,
       side: props.side,
       timeInForce: OrderTimeInForce.TIME_IN_FORCE_GTC,

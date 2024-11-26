@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { OrderType, OrderTimeInForce } from '@vegaprotocol/types';
 import { useVegaTransactionStore } from '@vegaprotocol/web3';
 import { useVegaWallet } from '@vegaprotocol/wallet-react';
-import { isFuture } from '@vegaprotocol/markets';
 
 import {
   AdvancedControls,
@@ -29,7 +28,6 @@ import * as utils from '../utils';
 
 export const Limit = (props: FormProps) => {
   const ticket = useTicketContext('default');
-  const product = ticket.market.tradableInstrument.instrument.product;
 
   const t = useT();
   const create = useVegaTransactionStore((state) => state.create);
@@ -41,7 +39,7 @@ export const Limit = (props: FormProps) => {
     resolver: zodResolver(schema),
     defaultValues: {
       ticketType: 'limit',
-      sizeMode: isFuture(product) && product.cap ? 'notional' : 'contracts',
+      sizeMode: 'notional',
       type: OrderType.TYPE_LIMIT,
       side: props.side,
       timeInForce: OrderTimeInForce.TIME_IN_FORCE_GTC,

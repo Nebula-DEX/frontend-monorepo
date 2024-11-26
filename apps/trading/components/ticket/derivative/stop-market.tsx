@@ -47,7 +47,7 @@ export const StopMarket = (props: FormProps) => {
     defaultValues: {
       ticketType: 'stopMarket',
       type: OrderType.TYPE_MARKET,
-      sizeMode: 'contracts',
+      sizeMode: 'notional',
       side: props.side,
       triggerDirection: StopOrderTriggerDirection.TRIGGER_DIRECTION_RISES_ABOVE,
       triggerType: 'price',

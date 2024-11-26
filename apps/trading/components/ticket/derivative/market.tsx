@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { OrderType, OrderTimeInForce } from '@vegaprotocol/types';
 import { useVegaTransactionStore } from '@vegaprotocol/web3';
 import { useVegaWallet } from '@vegaprotocol/wallet-react';
-import { useMarkPrice, isFuture } from '@vegaprotocol/markets';
+import { useMarkPrice } from '@vegaprotocol/markets';
 import { toBigNum } from '@vegaprotocol/utils';
 
 import { useT } from '../../../lib/use-t';
@@ -34,14 +34,13 @@ export const Market = (props: FormProps) => {
   const { pubKey } = useVegaWallet();
 
   const ticket = useTicketContext('default');
-  const product = ticket.market.tradableInstrument.instrument.product;
 
   const schema = useMarketSchema(ticket.market);
   const form = useForm<FormFieldsMarket>({
     resolver: zodResolver(schema),
     defaultValues: {
       ticketType: 'market',
-      sizeMode: isFuture(product) && product.cap ? 'notional' : 'contracts',
+      sizeMode: 'notional',
       type: OrderType.TYPE_MARKET,
       side: props.side,
       timeInForce: OrderTimeInForce.TIME_IN_FORCE_IOC,
