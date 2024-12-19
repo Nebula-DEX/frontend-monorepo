@@ -20,7 +20,7 @@ import { type FormFieldsMarket, useMarketSchema } from '../schemas';
 import { TicketTypeSelect } from '../ticket-type-select';
 import { type FormProps } from './ticket';
 import { useTicketContext } from '../ticket-context';
-import { TicketEventUpdater } from '../ticket-events';
+import { SpotMarketTicketEventUpdater } from '../ticket-events';
 import { Feedback } from './feedback';
 import { Datagrid } from '../elements/datagrid';
 
@@ -60,7 +60,7 @@ export const Market = (props: FormProps) => {
 
   return (
     <FormProvider {...form}>
-      <TicketEventUpdater />
+      <SpotMarketTicketEventUpdater />
       <Form
         onSubmit={form.handleSubmit((fields) => {
           const reference = `${pubKey}-${Date.now()}-${uniqueId()}`;

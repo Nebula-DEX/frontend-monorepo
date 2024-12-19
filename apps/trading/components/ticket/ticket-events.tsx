@@ -1,7 +1,26 @@
-import { useTicketEvents } from './use-ticket-events';
+import {
+  useDerivativeLimitTicketEvents,
+  useDerivativeMarketTicketEvents,
+  useSpotLimitTicketEvents,
+  useSpotMarketTicketEvents,
+} from './use-ticket-events';
 
-/** Render the useTicketEvents hook */
-export const TicketEventUpdater = () => {
-  useTicketEvents();
+export const DerivativeLimitTicketEventUpdater = () => {
+  useDerivativeLimitTicketEvents();
+  return null;
+};
+
+export const DerivativeMarketTicketEventUpdater = () => {
+  useDerivativeMarketTicketEvents();
+  return null;
+};
+
+export const SpotLimitTicketEventUpdater = () => {
+  useSpotLimitTicketEvents();
+  return null;
+};
+
+export const SpotMarketTicketEventUpdater = () => {
+  useSpotMarketTicketEvents();
   return null;
 };

@@ -2,6 +2,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import uniqueId from 'lodash/uniqueId';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addDays } from 'date-fns';
+import BigNumber from 'bignumber.js';
 
 import {
   OrderType,
@@ -21,7 +22,7 @@ import {
 import { type FormFieldsStopMarket, useStopMarketSchema } from '../schemas';
 import { TicketTypeSelect } from '../ticket-type-select';
 import { type FormProps } from './ticket';
-import { TicketEventUpdater } from '../ticket-events';
+import { SpotMarketTicketEventUpdater } from '../ticket-events';
 import { useTicketContext } from '../ticket-context';
 import { SubmitButton } from '../elements/submit-button';
 import { Datagrid } from '../elements/datagrid';
@@ -33,7 +34,6 @@ import * as Fields from '../fields';
 import * as Data from '../info';
 import * as SpotFields from './fields';
 import * as utils from '../utils';
-import BigNumber from 'bignumber.js';
 
 export const StopMarket = (props: FormProps) => {
   const t = useT();
@@ -77,7 +77,7 @@ export const StopMarket = (props: FormProps) => {
 
   return (
     <FormProvider {...form}>
-      <TicketEventUpdater />
+      <SpotMarketTicketEventUpdater />
       <Form
         onSubmit={form.handleSubmit((fields) => {
           const reference = `${pubKey}-${Date.now()}-${uniqueId()}`;

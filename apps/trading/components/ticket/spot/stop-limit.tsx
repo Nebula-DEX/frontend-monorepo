@@ -18,7 +18,7 @@ import {
   FormGrid,
 } from '../elements/form';
 import { type FormFieldsStopLimit, useStopLimitSchema } from '../schemas';
-import { TicketEventUpdater } from '../ticket-events';
+import { SpotLimitTicketEventUpdater } from '../ticket-events';
 import { TicketTypeSelect } from '../ticket-type-select';
 import { type FormProps } from './ticket';
 import { useTicketContext } from '../ticket-context';
@@ -75,7 +75,7 @@ export const StopLimit = (props: FormProps) => {
 
   return (
     <FormProvider {...form}>
-      <TicketEventUpdater />
+      <SpotLimitTicketEventUpdater />
       <Form
         onSubmit={form.handleSubmit((fields) => {
           const reference = `${pubKey}-${Date.now()}-${uniqueId()}`;

@@ -59,6 +59,7 @@ export const Ticket = ({ market }: { market: MarketInfo }) => {
 };
 
 export type FormProps = {
+  type: TicketType;
   side: Side;
   onSideChange: (value: Side) => void;
   onTypeChange: (value: TicketType) => void;
@@ -69,6 +70,7 @@ export const TicketDefaultSwitch = () => {
   const [type, setType] = useTicketType();
 
   const props: FormProps = {
+    type,
     side,
     onSideChange: (value: Side) => setSide(value),
     onTypeChange: (value: TicketType) => setType(value),

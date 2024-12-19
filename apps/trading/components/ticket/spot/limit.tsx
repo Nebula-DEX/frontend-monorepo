@@ -20,7 +20,7 @@ import { useTicketContext } from '../ticket-context';
 import { SubmitButton } from '../elements/submit-button';
 import { useT } from '../../../lib/use-t';
 import { Datagrid } from '../elements/datagrid';
-import { TicketEventUpdater } from '../ticket-events';
+import { SpotLimitTicketEventUpdater } from '../ticket-events';
 import { Feedback } from './feedback';
 
 import * as Fields from '../fields';
@@ -62,7 +62,7 @@ export const Limit = (props: FormProps) => {
 
   return (
     <FormProvider {...form}>
-      <TicketEventUpdater />
+      <SpotLimitTicketEventUpdater />
       <Form
         onSubmit={form.handleSubmit((fields) => {
           const reference = `${pubKey}-${Date.now()}-${uniqueId()}`;
